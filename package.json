@@ -10,7 +10,7 @@
 		"start:prod": "nx run-many --target=serve --configuration=production --all",
 		"lint": "nx run-many --target=lint --all",
 		"test": "nx run-many --target=test --all",
-		"format": "prettier --write \"apps/**/*.ts\" \"shared/**/*.ts\"",
+		"format": "prettier --write \"apps/**/*.ts\" \"shared/**/*.ts\" \"apps/**/*.tsx\"",
 		"prisma:generate": "prisma generate",
 		"prisma:migrate": "prisma migrate dev",
 		"prisma:deploy": "prisma migrate deploy",
