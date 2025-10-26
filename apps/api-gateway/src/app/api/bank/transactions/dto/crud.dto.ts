@@ -1,37 +1,37 @@
 import {
-  TransactionCreateRequestSchema,
-  TransactionCreateResponseSchema,
-  TransactionDeleteRequestSchema,
-  TransactionDeleteResponseSchema,
-  TransactionGetRequestSchema,
-  TransactionGetResponseSchema,
-  TransactionUpdateRequestSchema,
-  TransactionUpdateResponseSchema,
+	TransactionCreateRequestSchema,
+	TransactionCreateResponseSchema,
+	TransactionDeleteRequestSchema,
+	TransactionDeleteResponseSchema,
+	TransactionGetRequestSchema,
+	TransactionGetResponseSchema,
+	TransactionUpdateRequestSchema,
+	TransactionUpdateResponseSchema,
 } from '@hermes/contracts'
 import { createZodDto } from 'nestjs-zod'
 
 export class TransactionCreateRequest extends createZodDto(
-  TransactionCreateRequestSchema,
-) { }
+	TransactionCreateRequestSchema,
+) {}
 export class TransactionGetRequest extends createZodDto(
-  TransactionGetRequestSchema,
-) { }
+	TransactionGetRequestSchema,
+) {}
 export class TransactionUpdateRequest extends createZodDto(
-  TransactionUpdateRequestSchema,
-) { }
+	TransactionUpdateRequestSchema,
+) {}
 export class TransactionDeleteRequest extends createZodDto(
-  TransactionDeleteRequestSchema,
-) { }
+	TransactionDeleteRequestSchema,
+) {}
 
 export class TransactionCreateResponse extends createZodDto(
-  TransactionCreateResponseSchema,
-) { }
+	TransactionCreateResponseSchema,
+) {}
 export class TransactionGetResponse extends createZodDto(
-  TransactionGetResponseSchema,
-) { }
+	TransactionGetResponseSchema,
+) {}
 export class TransactionUpdateResponse extends createZodDto(
-  TransactionUpdateResponseSchema,
-) { }
+	TransactionUpdateResponseSchema,
+) {}
 export class TransactionDeleteResponse extends createZodDto(
-  TransactionDeleteResponseSchema,
-) { }
+	TransactionDeleteResponseSchema,
+) {}

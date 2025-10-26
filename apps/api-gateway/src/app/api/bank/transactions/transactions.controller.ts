@@ -1,3 +1,4 @@
+import { TransactionGetRequestSchema } from '@hermes/contracts'
 import {
 	Body,
 	Controller,
