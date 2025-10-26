@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URI")
+}
+
+model User {
+  id String @id @default(uuid())
+
+  username String @unique @db.VarChar(32)
+  email    String @unique @db.VarChar(320)
+  password String @db.VarChar(255)
+
+  role UserRole @default(REGULAR)
+
+  bank   Bank?   @relation(fields: [bankId], references: [id])
+  bankId String? @map("bank_id")
+
+  Transaction Transaction[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Bank {
+  id String @id @default(uuid())
+
+  name        String @db.VarChar(32)
+  description String @default("") @db.VarChar(1000)
+
+  users        User[]
+  transactions Transaction[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("banks")
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  amount      Decimal @db.Decimal(10, 2)
+  description String  @default("") @db.VarChar(1000)
+
+  type     TransactionType
+  category TransactionCategory
+
+  bank   Bank   @relation(fields: [bankId], references: [id])
+  bankId String @map("bank_id")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("transactions")
+}
+
+enum TransactionCategory {
+  FOOD
+  CLOTHES
+  MARKETPLACES
+  CHEMICALS
+  DRUGS
+  TECHNIQUE
+  GAMES
+  OTHER
+
+  @@map("transaction_category")
+}
+
+enum TransactionType {
+  WITHDRAW
+  DEPOSIT
+
+  @@map("transaction_type")
+}
+
+enum UserRole {
+  REGULAR
+  ADMIN
+
+  @@map("user_role")
+}
