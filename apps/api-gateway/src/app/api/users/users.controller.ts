@@ -1,3 +1,4 @@
+import type { ProfileGetResponse } from '@hermes/contracts'
 import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import type { User } from '@prisma/client'
@@ -14,7 +15,7 @@ export class UsersController {
 	@Protected()
 	@HttpCode(HttpStatus.OK)
 	@Get('@me')
-	public getMe(@Authorized() user: User) {
+	public getMe(@Authorized() user: User): ProfileGetResponse {
 		return user
 	}
 }
