@@ -19,7 +19,8 @@
 		"paths": {
 			"@/*": ["src/*"],
 			"@shared": ["src/shared"],
-			"@public": ["public"]
+			"@public": ["public"],
+			"@hermes/contracts": ["../../shared/contracts/src/index.ts"]
 		},
 		"plugins": [
 			{
