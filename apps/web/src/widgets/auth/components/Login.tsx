@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form'
 
 import { Button, Form, FormField } from '@/shared'
 
+import { useLoginMutation } from '../hooks'
+
 export const Login = ({ router }: AuthTypeProps) => {
 	const form = useForm<LoginRequest>({
 		resolver: zodResolver(LoginRequestSchema),
@@ -17,8 +19,12 @@ export const Login = ({ router }: AuthTypeProps) => {
 		},
 	})
 
+	const { login, isLoadingLogin } = useLoginMutation(() => {
+		form.reset()
+	})
+
 	const onSubmit = (values: LoginRequest) => {
-		console.log(values)
+		login({ values })
 	}
 
 	return (
@@ -42,6 +48,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.email?.message}
+								disabled={isLoadingLogin}
 							/>
 						)}
 					/>
@@ -56,6 +63,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.password?.message}
+								disabled={isLoadingLogin}
 							/>
 						)}
 					/>
@@ -64,6 +72,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 							variant={'default'}
 							className='w-3/4'
 							type={'submit'}
+							disabled={isLoadingLogin}
 						>
 							<p className='font-semibold'>Войти</p>
 						</Button>

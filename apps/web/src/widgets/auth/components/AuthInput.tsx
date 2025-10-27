@@ -13,6 +13,7 @@ interface IAuthInputProps {
 	onBlur?: () => void
 	onFocus?: () => void
 	error?: string
+	disabled?: boolean
 }
 
 export const AuthInput = ({
@@ -23,6 +24,7 @@ export const AuthInput = ({
 	onBlur,
 	onFocus,
 	error,
+	disabled,
 }: IAuthInputProps): ReactElement => {
 	const [isFocused, setIsFocused] = useState(false)
 
@@ -60,6 +62,7 @@ export const AuthInput = ({
 				onBlur={handleBlur}
 				onChange={handleChange}
 				value={value}
+				disabled={disabled}
 			/>
 			{error && <p className='text-destructive text-sm mt-1'>{error}</p>}
 		</div>

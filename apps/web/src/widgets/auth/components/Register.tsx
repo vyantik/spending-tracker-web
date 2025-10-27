@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form'
 
 import { Button, Form, FormField } from '@/shared'
 
+import { useRegisterMutation } from '../hooks'
+
 export const Register = ({ router }: AuthTypeProps) => {
 	const form = useForm<RegisterRequest>({
 		resolver: zodResolver(RegisterRequestSchema),
@@ -19,8 +21,12 @@ export const Register = ({ router }: AuthTypeProps) => {
 		},
 	})
 
+	const { register, isLoadingRegister } = useRegisterMutation(() => {
+		form.reset()
+	})
+
 	const onSubmit = (values: RegisterRequest) => {
-		console.log(values)
+		register({ values })
 	}
 
 	return (
@@ -43,6 +49,7 @@ export const Register = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.username?.message}
+								disabled={isLoadingRegister}
 							/>
 						)}
 					/>
@@ -57,6 +64,7 @@ export const Register = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.email?.message}
+								disabled={isLoadingRegister}
 							/>
 						)}
 					/>
@@ -71,6 +79,7 @@ export const Register = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.password?.message}
+								disabled={isLoadingRegister}
 							/>
 						)}
 					/>
@@ -88,6 +97,7 @@ export const Register = ({ router }: AuthTypeProps) => {
 									form.formState.errors.passwordRepeat
 										?.message
 								}
+								disabled={isLoadingRegister}
 							/>
 						)}
 					/>
@@ -96,6 +106,7 @@ export const Register = ({ router }: AuthTypeProps) => {
 							variant={'default'}
 							className='w-3/4'
 							type={'submit'}
+							disabled={isLoadingRegister}
 						>
 							<p className='font-semibold'>Зарегистрироваться</p>
 						</Button>

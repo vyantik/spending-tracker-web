@@ -24,7 +24,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 			throw err
 		})
 
-		this.logger.log('Redis connection success')
+		this.logger.log('✅ Redis connected')
 	}
 
 	onModuleDestroy() {

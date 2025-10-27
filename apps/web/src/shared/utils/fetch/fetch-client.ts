@@ -46,19 +46,30 @@ export class FetchClient {
 		method: RequestInit['method'],
 		options: RequestOptions = {},
 	): Promise<T> {
-		let url = `${this.baseUrl}/${endpoint}`
+		const normalizedEndpoint = endpoint.startsWith('/')
+			? endpoint.slice(1)
+			: endpoint
+		const normalizedBaseUrl = this.baseUrl.endsWith('/')
+			? this.baseUrl.slice(0, -1)
+			: this.baseUrl
+		let url = `${normalizedBaseUrl}/${normalizedEndpoint}`
 
 		if (options.params) {
 			url += this.createSearchParams(options.params)
 		}
 
+		const { headers: optionHeaders, params: _, ...restOptions } = options
+		const { headers: thisOptionHeaders, ...restThisOptions } =
+			this.options || {}
+
 		const config: RequestInit = {
-			...options,
-			...(!!this.options && { ...this.options }),
+			...restOptions,
+			...restThisOptions,
 			method,
 			headers: {
-				...(!!this?.headers && { ...options.headers }),
 				...this.headers,
+				...thisOptionHeaders,
+				...optionHeaders,
 			},
 		}
 
