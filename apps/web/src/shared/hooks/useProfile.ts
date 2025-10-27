@@ -8,6 +8,7 @@ export function useProfile() {
 	const { data: user, isLoading: isLoadingUser } = useQuery({
 		queryKey: ['profile'],
 		queryFn: () => userService.getProfile(),
+		retry: false,
 	})
 
 	return {
