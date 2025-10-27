@@ -41,6 +41,13 @@ export class FetchClient {
 		return `?${searchParams.toString()}`
 	}
 
+	private getAccessToken(): string | null {
+		if (typeof window === 'undefined') {
+			return null
+		}
+		return localStorage.getItem('access_token')
+	}
+
 	private async request<T>(
 		endpoint: string,
 		method: RequestInit['method'],
@@ -62,6 +69,11 @@ export class FetchClient {
 		const { headers: thisOptionHeaders, ...restThisOptions } =
 			this.options || {}
 
+		const token = this.getAccessToken()
+		const authHeaders: Record<string, string> = token
+			? { Authorization: `Bearer ${token}` }
+			: {}
+
 		const config: RequestInit = {
 			...restOptions,
 			...restThisOptions,
@@ -69,6 +81,7 @@ export class FetchClient {
 			headers: {
 				...this.headers,
 				...thisOptionHeaders,
+				...authHeaders,
 				...optionHeaders,
 			},
 		}
