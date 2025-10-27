@@ -30,7 +30,7 @@ export const Header = (): ReactElement => {
 						<TooltipTrigger asChild>
 							<Button
 								variant='default'
-								onClick={() => router.push('/auth')}
+								onClick={() => router.push('/auth/login')}
 							>
 								<Image
 									src={DoorOpen}
