@@ -1,8 +1,17 @@
 import z from 'zod'
 
 export const BankCreateRequestSchema = z.object({
-	name: z.string().min(2).max(32),
-	description: z.string().min(1).max(1000).optional(),
+	name: z
+		.string()
+		.min(2, { message: 'Название должно содержать минимум 2 символа' })
+		.max(32, { message: 'Название должно содержать максимум 32 символа' }),
+	description: z
+		.string()
+		.min(1, { message: 'Описание не может быть пустым' })
+		.max(1000, {
+			message: 'Описание должно содержать максимум 1000 символов',
+		})
+		.optional(),
 })
 
 export const BankCreateResponseSchema = z.object({
@@ -13,8 +22,18 @@ export type BankCreateRequest = z.infer<typeof BankCreateRequestSchema>
 export type BankCreateResponse = z.infer<typeof BankCreateResponseSchema>
 
 export const BankUpdateRequestSchema = z.object({
-	name: z.string().min(2).max(32).optional(),
-	description: z.string().min(1).max(1000).optional(),
+	name: z
+		.string()
+		.min(2, { message: 'Название должно содержать минимум 2 символа' })
+		.max(32, { message: 'Название должно содержать максимум 32 символа' })
+		.optional(),
+	description: z
+		.string()
+		.min(1, { message: 'Описание не может быть пустым' })
+		.max(1000, {
+			message: 'Описание должно содержать максимум 1000 символов',
+		})
+		.optional(),
 })
 
 export const BankUpdateResponseSchema = z.object({
@@ -37,8 +56,12 @@ export const BankGetRequestSchema = z.object({})
 
 export const BankGetResponseSchema = z.object({
 	id: z.uuid(),
-	name: z.string().max(32),
-	description: z.string().max(1000),
+	name: z
+		.string()
+		.max(32, { message: 'Название должно содержать максимум 32 символа' }),
+	description: z.string().max(1000, {
+		message: 'Описание должно содержать максимум 1000 символов',
+	}),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 })

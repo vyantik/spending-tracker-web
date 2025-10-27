@@ -7,8 +7,16 @@ import {
 } from './transaction'
 
 export const TransactionCreateRequestSchema = z.object({
-	amount: z.number().min(0),
-	description: z.string().min(1).max(1000).optional(),
+	amount: z
+		.number()
+		.min(0, { message: 'Сумма должна быть больше или равна 0' }),
+	description: z
+		.string()
+		.min(1, { message: 'Описание не может быть пустым' })
+		.max(1000, {
+			message: 'Описание должно содержать максимум 1000 символов',
+		})
+		.optional(),
 	type: TransactionType,
 	category: TransactionCategory,
 })
@@ -25,8 +33,17 @@ export type TransactionCreateResponse = z.infer<
 >
 
 export const TransactionUpdateRequestSchema = z.object({
-	amount: z.number().min(0).optional(),
-	description: z.string().min(1).max(1000).optional(),
+	amount: z
+		.number()
+		.min(0, { message: 'Сумма должна быть больше или равна 0' })
+		.optional(),
+	description: z
+		.string()
+		.min(1, { message: 'Описание не может быть пустым' })
+		.max(1000, {
+			message: 'Описание должно содержать максимум 1000 символов',
+		})
+		.optional(),
 	type: TransactionType.optional(),
 	category: TransactionCategory.optional(),
 })
