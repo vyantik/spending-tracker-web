@@ -17,7 +17,7 @@ export const Header = (): ReactElement => {
 	const router = useRouter()
 
 	return (
-		<header className='w-screen h-[5vh] bg-linear-240 from-blue-500 to-blue-300 dark:from-[#0A0A0A] dark:to-[#0a0a0a] p-4 flex'>
+		<header className='absolute top-0 left-0 w-screen h-[5vh] p-4 flex bg-white dark:bg-[#161616]'>
 			<div className='mr-auto'>
 				<Button variant='default'>ХУЙ</Button>
 			</div>
