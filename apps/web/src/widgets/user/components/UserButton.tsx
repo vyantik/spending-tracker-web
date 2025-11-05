@@ -1,6 +1,8 @@
 'use client'
 
-import { LucideLogOut } from 'lucide-react'
+import { LucideBaby, LucideLogOut } from 'lucide-react'
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import type { ReactElement } from 'react'
 
 import {
 	Avatar,
@@ -16,7 +18,10 @@ import {
 
 import { useLogoutMutation } from '../hooks'
 
-export function UserButton() {
+interface UserButtonProps {
+	router: AppRouterInstance
+}
+export function UserButton({ router }: UserButtonProps): ReactElement | null {
 	const { user } = useProfile()
 	const { logout, isLoadingLogout } = useLogoutMutation()
 
@@ -31,6 +36,13 @@ export function UserButton() {
 				</Avatar>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-40' align='end'>
+				<DropdownMenuItem
+					disabled={isLoadingLogout}
+					onClick={() => router.push('profile')}
+				>
+					<LucideBaby className='mr-2 size-4' />
+					Профиль
+				</DropdownMenuItem>
 				<DropdownMenuItem
 					disabled={isLoadingLogout}
 					onClick={() => logout()}

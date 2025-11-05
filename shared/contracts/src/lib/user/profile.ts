@@ -1,7 +1,8 @@
 import z from 'zod'
 
-import { UserSchema } from './user'
-
-export const ProfileGetResponseSchema = UserSchema
+export const ProfileGetResponseSchema = z.object({
+	username: z.string().min(2).max(32),
+	email: z.email(),
+})
 
 export type ProfileGetResponse = z.infer<typeof ProfileGetResponseSchema>

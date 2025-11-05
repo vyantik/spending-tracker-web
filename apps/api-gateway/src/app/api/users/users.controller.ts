@@ -16,6 +16,9 @@ export class UsersController {
 	@HttpCode(HttpStatus.OK)
 	@Get('@me')
 	public getMe(@Authorized() user: User): ProfileGetResponse {
-		return user
+		return {
+			email: user.email,
+			username: user.username,
+		}
 	}
 }
