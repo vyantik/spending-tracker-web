@@ -10,7 +10,11 @@ import { authService } from '../services'
 export function useLoginMutation(onSuccessCallback?: () => void) {
 	const router = useRouter()
 	const queryClient = useQueryClient()
-	const { mutate: login, isPending: isLoadingLogin } = useMutation({
+	const {
+		mutate: login,
+		isPending: isLoadingLogin,
+		isSuccess: isLoginSuccess,
+	} = useMutation({
 		mutationKey: ['login user'],
 		mutationFn: ({ values }: { values: LoginRequest }) =>
 			authService.login(values),
@@ -30,5 +34,6 @@ export function useLoginMutation(onSuccessCallback?: () => void) {
 	return {
 		login,
 		isLoadingLogin,
+		isLoginSuccess,
 	}
 }

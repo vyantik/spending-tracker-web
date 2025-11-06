@@ -19,13 +19,15 @@ export const Login = ({ router }: AuthTypeProps) => {
 		},
 	})
 
-	const { login, isLoadingLogin } = useLoginMutation(() => {
+	const { login, isLoadingLogin, isLoginSuccess } = useLoginMutation(() => {
 		form.reset()
 	})
 
 	const onSubmit = (values: LoginRequest) => {
 		login({ values })
 	}
+
+	const isFormDisabled = isLoadingLogin || isLoginSuccess
 
 	return (
 		<>
@@ -48,7 +50,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.email?.message}
-								disabled={isLoadingLogin}
+								disabled={isFormDisabled}
 							/>
 						)}
 					/>
@@ -63,7 +65,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 								onChange={field.onChange}
 								onBlur={field.onBlur}
 								error={form.formState.errors.password?.message}
-								disabled={isLoadingLogin}
+								disabled={isFormDisabled}
 							/>
 						)}
 					/>
@@ -72,7 +74,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 							variant={'default'}
 							className='w-3/4'
 							type={'submit'}
-							disabled={isLoadingLogin}
+							disabled={isFormDisabled}
 						>
 							<p className='font-semibold'>Войти</p>
 						</Button>
@@ -81,6 +83,7 @@ export const Login = ({ router }: AuthTypeProps) => {
 							className='w-3/4'
 							onClick={() => router.push('/auth/register')}
 							type='button'
+							disabled={isFormDisabled}
 						>
 							<p className='font-semibold'>Регистрация</p>
 						</Button>

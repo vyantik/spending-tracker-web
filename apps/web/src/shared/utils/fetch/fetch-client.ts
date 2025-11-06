@@ -48,6 +48,23 @@ export class FetchClient {
 		return localStorage.getItem('access_token')
 	}
 
+	private async clearRefreshToken(): Promise<void> {
+		if (typeof window === 'undefined') {
+			return
+		}
+
+		const normalizedBaseUrl = this.baseUrl.endsWith('/')
+			? this.baseUrl.slice(0, -1)
+			: this.baseUrl
+
+		try {
+			fetch(`${normalizedBaseUrl}/auth/logout`, {
+				method: 'POST',
+				credentials: 'include',
+			}).catch(() => {})
+		} catch {}
+	}
+
 	private async request<T>(
 		endpoint: string,
 		method: RequestInit['method'],
@@ -92,6 +109,10 @@ export class FetchClient {
 			const error = (await response.json()) as
 				| { message: string }
 				| undefined
+
+			if (response.status === 401) {
+				this.clearRefreshToken().catch(() => {})
+			}
 
 			throw new FetchError(
 				response.status,
