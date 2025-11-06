@@ -8,6 +8,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
@@ -49,8 +50,16 @@ export class TransactionsController {
 	@Get()
 	public async getTransactions(
 		@Authorized('bankId') bankId: string | null,
+		@Query('page') page?: string,
+		@Query('limit') limit?: string,
 	): Promise<BankGetTransactionsResponse> {
-		return await this.transactionsService.getTransactions(bankId)
+		const pageNum = page ? parseInt(page, 10) : 1
+		const limitNum = limit ? parseInt(limit, 10) : 10
+		return await this.transactionsService.getTransactions(
+			bankId,
+			pageNum,
+			limitNum,
+		)
 	}
 
 	@ApiOperation({ summary: 'Add transactions' })

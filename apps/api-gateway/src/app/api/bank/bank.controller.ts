@@ -47,9 +47,9 @@ export class BankController {
 	@Post()
 	public async create(
 		@Body() dto: BankCreateRequest,
-		@Authorized('bankId') bankId: string | null,
+		@Authorized('id') userId: string,
 	): Promise<BankCreateResponse> {
-		return await this.bankService.create(bankId, dto)
+		return await this.bankService.create(userId, dto)
 	}
 
 	@ApiOperation({ summary: 'Get bank' })
@@ -61,9 +61,9 @@ export class BankController {
 	@Protected()
 	@Get()
 	public async get(
-		@Authorized('bankId') bankId: string | null,
+		@Authorized('id') userId: string,
 	): Promise<BankGetResponse> {
-		return await this.bankService.get(bankId)
+		return await this.bankService.get(userId)
 	}
 
 	@ApiOperation({ summary: 'Update bank' })

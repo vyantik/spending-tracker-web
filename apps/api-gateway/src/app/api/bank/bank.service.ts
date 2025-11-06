@@ -13,23 +13,32 @@ import type { BankCreateRequest, BankUpdateRequest } from './dto'
 export class BankService {
 	public constructor(private readonly bankRepository: BankRepository) {}
 
-	public async get(bankId: string | null): Promise<BankGetResponse> {
-		if (bankId === null) {
+	public async get(userId: string): Promise<BankGetResponse> {
+		const bank = await this.bankRepository.findByUserId(userId)
+
+		if (!bank) {
 			throw new BadRequestException('Пользователь еще не создал банк')
 		}
 
-		return await this.bankRepository.findUnique({ id: bankId })
+		return {
+			...bank,
+		}
 	}
 
 	public async create(
-		bankId: string | null,
+		userId: string,
 		dto: BankCreateRequest,
 	): Promise<BankCreateResponse> {
-		if (bankId !== null) {
+		const bank = await this.bankRepository.findByUserId(userId)
+
+		if (bank) {
 			throw new BadRequestException('Пользователь уже создал банк')
 		}
 
-		await this.bankRepository.create({ ...dto })
+		await this.bankRepository.create({
+			...dto,
+			users: { connect: { id: userId } },
+		})
 
 		return {
 			message: 'ok',

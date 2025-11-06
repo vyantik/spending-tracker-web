@@ -18,3 +18,5 @@ export const TransactionSchema = z.object({
 	type: TransactionType,
 	category: TransactionCategory,
 })
+
+export type Transaction = z.infer<typeof TransactionSchema>

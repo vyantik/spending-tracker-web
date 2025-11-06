@@ -18,8 +18,22 @@ export class TransactionsRepository extends BaseRepository<
 		return this.prismaService.transaction
 	}
 
-	public async getBankTransactions(bankId: string): Promise<Transaction[]> {
-		return await this.findMany({ bankId })
+	public async getBankTransactions(
+		bankId: string,
+		page: number = 1,
+		limit: number = 10,
+	): Promise<{ transactions: Transaction[]; total: number }> {
+		const skip = (page - 1) * limit
+		const [transactions, total] = await Promise.all([
+			this.model.findMany({
+				where: { bankId },
+				skip,
+				take: limit,
+				orderBy: { createdAt: 'desc' },
+			}),
+			this.model.count({ where: { bankId } }),
+		])
+		return { transactions, total }
 	}
 
 	public async addTransaction(

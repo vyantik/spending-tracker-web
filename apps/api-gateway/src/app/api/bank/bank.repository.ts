@@ -15,4 +15,10 @@ export class BankRepository extends BaseRepository<
 	protected get model(): Prisma.BankDelegate<DefaultArgs> {
 		return this.prismaService.bank
 	}
+
+	public async findByUserId(userId: string): Promise<Bank | null> {
+		return await this.findFirst({
+			users: { some: { id: userId } },
+		})
+	}
 }

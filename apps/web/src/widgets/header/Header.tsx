@@ -24,7 +24,17 @@ export const Header = (): ReactElement => {
 				{isLoadingUser ? (
 					<UserButtonLoading />
 				) : user ? (
-					<UserButton router={router} />
+					<>
+						<Button>
+							<p
+								className='font-semibold'
+								onClick={() => router.push('/bank')}
+							>
+								Банк
+							</p>
+						</Button>
+						<UserButton router={router} />
+					</>
 				) : (
 					<LoginButton router={router} />
 				)}

@@ -18,17 +18,28 @@ export class TransactionsService {
 
 	public async getTransactions(
 		bankId: string | null,
+		page: number = 1,
+		limit: number = 10,
 	): Promise<BankGetTransactionsResponse> {
 		if (bankId === null) {
 			throw new BadRequestException('Пользователь еще не создал банк')
 		}
+		const { transactions, total } =
+			await this.transactionsRepository.getBankTransactions(
+				bankId,
+				page,
+				limit,
+			)
+		const totalPages = Math.ceil(total / limit)
 		return {
-			transactions: (
-				await this.transactionsRepository.getBankTransactions(bankId)
-			).map(transaction => ({
+			transactions: transactions.map(transaction => ({
 				...transaction,
 				amount: transaction.amount.toNumber(),
 			})),
+			total,
+			page,
+			limit,
+			totalPages,
 		}
 	}
 
