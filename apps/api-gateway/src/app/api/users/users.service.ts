@@ -23,13 +23,14 @@ export class UsersService {
 			username: user.username,
 			email: user.email,
 			avatar: user.avatar
-				? `${this.API_URL}/files/avatar/${user.avatar}`
+				? `${this.API_URL}/api/v1/files/avatar/${user.avatar}`
 				: null,
 		}
 	}
 
 	public async uploadAvatar(user: User, file: Uint8Array): Promise<void> {
-		const avatar = await this.filesService.uploadAvatar(user.id, file)
+		const oldFilename = user.avatar || undefined
+		const avatar = await this.filesService.uploadAvatar(file, oldFilename)
 		await this.usersRepository.updateUser(user.id, { avatar })
 	}
 }

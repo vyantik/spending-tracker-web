@@ -30,9 +30,14 @@ export function UserButton({ router }: UserButtonProps): ReactElement | null {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Avatar>
-					<AvatarImage src={undefined} />
-					<AvatarFallback>{user.username.slice(0, 1)}</AvatarFallback>
+				<Avatar key={user.avatar}>
+					<AvatarImage
+						src={user.avatar || undefined}
+						alt={user.username}
+					/>
+					<AvatarFallback>
+						{user.username.slice(0, 1).toUpperCase()}
+					</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-40' align='end'>

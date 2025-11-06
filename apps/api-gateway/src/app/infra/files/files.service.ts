@@ -7,12 +7,21 @@ import {
 	UploadAvatarRequest,
 	UploadAvatarResponse,
 } from '@hermes/types/proto/files'
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common'
+import {
+	BadRequestException,
+	Inject,
+	Injectable,
+	Logger,
+	NotFoundException,
+	OnModuleInit,
+} from '@nestjs/common'
+import { RpcException } from '@nestjs/microservices'
 import { ClientGrpc } from '@nestjs/microservices'
-import { firstValueFrom } from 'rxjs'
+import { catchError, firstValueFrom, throwError } from 'rxjs'
 
 @Injectable()
 export class FilesService implements OnModuleInit {
+	private readonly logger = new Logger(FilesService.name)
 	private filesService: FilesServiceClient
 
 	public constructor(
@@ -25,41 +34,128 @@ export class FilesService implements OnModuleInit {
 	}
 
 	/**
-	 * Загрузить аватар пользователя
-	 * @param userId - ID пользователя
+	 * Загрузить аватар
 	 * @param fileData - Данные файла
-	 * @returns Имя сохраненного файла
+	 * @param oldFilename - Старое имя файла для удаления (опционально)
+	 * @returns Имя сохраненного файла (UUID.webp)
+	 * @throws BadRequestException если файл невалиден
 	 */
 	public async uploadAvatar(
-		userId: string,
 		fileData: Uint8Array,
+		oldFilename?: string,
 	): Promise<string> {
 		const request: UploadAvatarRequest = {
-			userId,
 			file: fileData,
+			...(oldFilename && { oldFilename }),
 		}
 
-		const response: UploadAvatarResponse = await firstValueFrom(
-			this.filesService.uploadAvatar(request),
-		)
+		try {
+			const response: UploadAvatarResponse = await firstValueFrom(
+				this.filesService.uploadAvatar(request).pipe(
+					catchError(error => {
+						this.logger.error('Failed to upload avatar:', error)
 
-		return response.filename
+						if (error?.code === 3) {
+							return throwError(
+								() =>
+									new NotFoundException(
+										error.message || 'Avatar not found',
+									),
+							)
+						}
+
+						if (error?.code === 3 || error?.status === 404) {
+							return throwError(
+								() =>
+									new NotFoundException(
+										error.message || 'Avatar not found',
+									),
+							)
+						}
+
+						if (error?.code === 3 || error?.status === 400) {
+							return throwError(
+								() =>
+									new BadRequestException(
+										error.message || 'Invalid file',
+									),
+							)
+						}
+
+						return throwError(
+							() =>
+								new BadRequestException(
+									error.message || 'Failed to upload avatar',
+								),
+						)
+					}),
+				),
+			)
+
+			return response.filename
+		} catch (error) {
+			if (
+				error instanceof NotFoundException ||
+				error instanceof BadRequestException
+			) {
+				throw error
+			}
+
+			this.logger.error('Unexpected error uploading avatar:', error)
+			throw new BadRequestException('Failed to upload avatar')
+		}
 	}
 
 	/**
-	 * Получить аватар пользователя
-	 * @param userId - ID пользователя
+	 * Получить аватар по имени файла
+	 * @param filename - Имя файла (UUID.webp)
 	 * @returns Данные файла
+	 * @throws NotFoundException если файл не найден
 	 */
-	public async getAvatar(userId: string): Promise<Uint8Array> {
+	public async getAvatarByFilename(filename: string): Promise<Uint8Array> {
 		const request: GetAvatarRequest = {
-			userId,
+			filename,
 		}
 
-		const response: GetAvatarResponse = await firstValueFrom(
-			this.filesService.getAvatar(request),
-		)
+		try {
+			const response: GetAvatarResponse = await firstValueFrom(
+				this.filesService.getAvatar(request).pipe(
+					catchError(error => {
+						this.logger.error(
+							`Failed to get avatar for filename ${filename}:`,
+							error,
+						)
 
-		return response.file
+						if (error?.code === 5 || error?.status === 404) {
+							return throwError(
+								() =>
+									new NotFoundException(
+										error.message || 'Avatar not found',
+									),
+							)
+						}
+
+						return throwError(
+							() =>
+								new NotFoundException(
+									error.message || 'Avatar not found',
+								),
+						)
+					}),
+				),
+			)
+
+			return response.file
+		} catch (error) {
+			if (error instanceof NotFoundException) {
+				throw error
+			}
+
+			this.logger.error(
+				`Unexpected error getting avatar for filename ${filename}:`,
+				error,
+			)
+			throw new NotFoundException('Avatar not found')
+		}
 	}
 }

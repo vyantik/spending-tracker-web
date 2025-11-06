@@ -4,6 +4,7 @@ import {
 	HttpCode,
 	HttpStatus,
 	Param,
+	Req,
 	Res,
 } from '@nestjs/common'
 import {
@@ -13,7 +14,8 @@ import {
 	ApiParam,
 	ApiTags,
 } from '@nestjs/swagger'
-import type { Response } from 'express'
+import { createHash } from 'crypto'
+import type { Request, Response } from 'express'
 
 import { FilesService } from './files.service'
 
@@ -39,14 +41,41 @@ export class FilesController {
 	@ApiNotFoundResponse({ description: 'Avatar not found' })
 	public async getAvatar(
 		@Param('filename') filename: string,
+		@Req() req: Request,
 		@Res() res: Response,
 	): Promise<void> {
-		const userId = filename.replace(/\.[^.]+$/, '')
+		if (!filename || !filename.endsWith('.webp')) {
+			res.status(400).send('Invalid filename')
+			return
+		}
 
-		const fileData = await this.filesService.getAvatar(userId)
+		try {
+			const fileData =
+				await this.filesService.getAvatarByFilename(filename)
 
-		res.setHeader('Content-Type', 'image/webp')
-		res.setHeader('Content-Length', fileData.length)
-		res.send(Buffer.from(fileData))
+			const fileHash = createHash('md5')
+				.update(Buffer.from(fileData))
+				.digest('hex')
+			const etag = `"${fileHash}"`
+
+			const ifNoneMatch = req.headers['if-none-match']
+			if (ifNoneMatch === etag) {
+				res.status(304).end()
+				return
+			}
+
+			res.setHeader('Content-Type', 'image/webp')
+			res.setHeader('Content-Length', fileData.length)
+			res.setHeader('ETag', etag)
+			res.setHeader(
+				'Cache-Control',
+				'public, max-age=31536000, immutable',
+			)
+			res.setHeader('Last-Modified', new Date().toUTCString())
+
+			res.send(Buffer.from(fileData))
+		} catch (error) {
+			res.status(404).send('Avatar not found')
+		}
 	}
 }

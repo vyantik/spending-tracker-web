@@ -16,21 +16,15 @@ export class FilesController implements FilesServiceController {
 	public constructor(private readonly filesService: FilesService) {}
 
 	/**
-	 * Загрузить аватар пользователя
-	 * user_id должен быть передан в метаданных gRPC запроса
+	 * Загрузить аватар
 	 */
 	public async uploadAvatar(
 		request: UploadAvatarRequest,
 	): Promise<UploadAvatarResponse> {
-		const userId = request.userId
-
-		if (!userId) {
-			throw new Error('user_id is required in metadata')
-		}
-
+		const oldFilename = request.oldFilename
 		const filename = await this.filesService.uploadAvatar(
-			userId,
 			request.file,
+			oldFilename,
 		)
 
 		return {
@@ -39,12 +33,14 @@ export class FilesController implements FilesServiceController {
 	}
 
 	/**
-	 * Получить аватар пользователя
+	 * Получить аватар по имени файла
 	 */
 	public async getAvatar(
 		request: GetAvatarRequest,
 	): Promise<GetAvatarResponse> {
-		const fileData = await this.filesService.getAvatar(request.userId)
+		const fileData = await this.filesService.getAvatarByFilename(
+			request.filename,
+		)
 
 		return {
 			file: fileData,

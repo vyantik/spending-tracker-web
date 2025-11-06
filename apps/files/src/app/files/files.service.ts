@@ -110,16 +110,16 @@ export class FilesService {
 	}
 
 	/**
-	 * Загрузить аватар пользователя
-	 * @param userId - ID пользователя
+	 * Загрузить аватар
 	 * @param fileData - Данные файла
-	 * @returns Имя сохраненного файла
+	 * @param oldFilename - Старое имя файла для удаления (опционально)
+	 * @returns Имя сохраненного файла (UUID.webp)
 	 */
 	public async uploadAvatar(
-		userId: string,
 		fileData: Uint8Array,
+		oldFilename?: string,
 	): Promise<string> {
-		this.logger.log(`Uploading avatar for user ${userId}`)
+		this.logger.log('Uploading avatar')
 
 		this.validateFileSize(fileData)
 
@@ -135,52 +135,52 @@ export class FilesService {
 		const processedImage = await this.processImage(fileData)
 
 		const filename = await this.filesRepository.saveAvatar(
-			userId,
 			processedImage,
 			'webp',
+			oldFilename,
 		)
 
-		this.logger.log(
-			`Avatar uploaded successfully for user ${userId}: ${filename}`,
-		)
+		this.logger.log(`Avatar uploaded successfully: ${filename}`)
 		return filename
 	}
 
 	/**
-	 * Получить аватар пользователя
-	 * @param userId - ID пользователя
+	 * Получить аватар по имени файла
+	 * @param filename - Имя файла (UUID.webp)
 	 * @returns Данные файла
 	 * @throws NotFoundException если файл не найден
 	 */
-	public async getAvatar(userId: string): Promise<Uint8Array> {
-		this.logger.log(`Getting avatar for user ${userId}`)
+	public async getAvatarByFilename(filename: string): Promise<Uint8Array> {
+		this.logger.log(`Getting avatar by filename: ${filename}`)
 
-		const fileData = await this.filesRepository.getAvatar(userId)
+		const fileData =
+			await this.filesRepository.getAvatarByFilename(filename)
 
 		if (!fileData) {
 			throw new RpcException(
-				new NotFoundException(`Avatar not found for user ${userId}`),
+				new NotFoundException(`Avatar not found: ${filename}`),
 			)
 		}
 
-		this.logger.log(`Avatar retrieved successfully for user ${userId}`)
+		this.logger.log(`Avatar retrieved successfully: ${filename}`)
 		return fileData
 	}
 
 	/**
-	 * Удалить аватар пользователя
-	 * @param userId - ID пользователя
+	 * Удалить аватар по имени файла
+	 * @param filename - Имя файла (UUID.webp)
 	 * @returns true, если файл был удален
 	 */
-	public async deleteAvatar(userId: string): Promise<boolean> {
-		this.logger.log(`Deleting avatar for user ${userId}`)
+	public async deleteAvatarByFilename(filename: string): Promise<boolean> {
+		this.logger.log(`Deleting avatar: ${filename}`)
 
-		const deleted = await this.filesRepository.deleteAvatar(userId)
+		const deleted =
+			await this.filesRepository.deleteAvatarByFilename(filename)
 
 		if (deleted) {
-			this.logger.log(`Avatar deleted successfully for user ${userId}`)
+			this.logger.log(`Avatar deleted successfully: ${filename}`)
 		} else {
-			this.logger.warn(`Avatar not found for user ${userId}`)
+			this.logger.warn(`Avatar not found: ${filename}`)
 		}
 
 		return deleted

@@ -187,4 +187,76 @@ export class FetchClient {
 			...(!!body && { body: JSON.stringify(body) }),
 		})
 	}
+
+	public async uploadFile<T>(
+		endpoint: string,
+		file: File,
+		options: RequestOptions = {},
+	): Promise<T> {
+		const normalizedEndpoint = endpoint.startsWith('/')
+			? endpoint.slice(1)
+			: endpoint
+		const normalizedBaseUrl = this.baseUrl.endsWith('/')
+			? this.baseUrl.slice(0, -1)
+			: this.baseUrl
+		let url = `${normalizedBaseUrl}/${normalizedEndpoint}`
+
+		if (options.params) {
+			url += this.createSearchParams(options.params)
+		}
+
+		const { headers: optionHeaders, params: _, ...restOptions } = options
+		const { headers: thisOptionHeaders, ...restThisOptions } =
+			this.options || {}
+
+		const token = this.getAccessToken()
+		const authHeaders: Record<string, string> = token
+			? { Authorization: `Bearer ${token}` }
+			: {}
+
+		const formData = new FormData()
+		formData.append('file', file)
+
+		const config: RequestInit = {
+			...restOptions,
+			...restThisOptions,
+			method: 'POST',
+			headers: {
+				...this.headers,
+				...thisOptionHeaders,
+				...authHeaders,
+				...optionHeaders,
+			},
+			body: formData,
+		}
+
+		if (config.headers) {
+			delete (config.headers as Record<string, string>)['Content-Type']
+		}
+
+		const response: Response = await fetch(url, config)
+
+		if (!response.ok) {
+			const error = (await response.json()) as
+				| { message: string }
+				| undefined
+
+			if (response.status === 401) {
+				this.clearRefreshToken().catch(() => {})
+			}
+
+			throw new FetchError(
+				response.status,
+				error?.message || response.statusText,
+			)
+		}
+
+		if (
+			response.headers.get('Content-Type')?.includes('application/json')
+		) {
+			return (await response.json()) as unknown as T
+		} else {
+			return (await response.text()) as unknown as T
+		}
+	}
 }

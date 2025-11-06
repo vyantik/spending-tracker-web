@@ -1,4 +1,7 @@
-import type { ProfileGetResponse } from '@hermes/contracts'
+import type {
+	ProfileGetResponse,
+	UploadAvatarResponse,
+} from '@hermes/contracts'
 
 import { api } from '@/shared/api'
 
@@ -9,6 +12,13 @@ class UserService {
 
 	public async logout(): Promise<undefined> {
 		return await api.post<undefined>('/auth/logout')
+	}
+
+	public async uploadAvatar(file: File): Promise<UploadAvatarResponse> {
+		return await api.uploadFile<UploadAvatarResponse>(
+			'/users/@me/avatar',
+			file,
+		)
 	}
 }
 

@@ -15,6 +15,7 @@ import {
 
 import { useLogoutMutation } from '../hooks'
 
+import { ProfileImage } from './ProfileImage'
 import { ProfileInfo } from './ProfileInfo'
 
 export function Profile(): ReactElement {
@@ -34,9 +35,7 @@ export function Profile(): ReactElement {
 					</CardAction>
 				</CardHeader>
 				<CardContent>
-					<div className='mb-8'>
-						{/*TODO: Add ProfileImage and upload avatar */}
-					</div>
+					<ProfileImage />
 					<div className='space-y-2'>
 						<ProfileInfo
 							info={profile.user?.username}

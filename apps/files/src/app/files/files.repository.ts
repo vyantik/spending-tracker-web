@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { randomUUID } from 'crypto'
 import {
 	existsSync,
 	mkdirSync,
@@ -29,62 +30,70 @@ export class FilesRepository {
 	}
 
 	/**
-	 * Сохранить файл аватара для пользователя
-	 * @param userId - ID пользователя
+	 * Сохранить файл аватара
 	 * @param fileData - Данные файла (Uint8Array)
 	 * @param extension - Расширение файла (например, 'jpg', 'png')
-	 * @returns Имя сохраненного файла
+	 * @param oldFilename - Старое имя файла для удаления (опционально)
+	 * @returns Имя сохраненного файла (UUID.extension)
 	 */
 	public async saveAvatar(
-		userId: string,
 		fileData: Uint8Array,
 		extension: string,
+		oldFilename?: string,
 	): Promise<string> {
-		const filename = `${userId}.${extension}`
+		const uuid = randomUUID()
+		const filename = `${uuid}.${extension}`
 		const filePath = join(this.uploadsDir, filename)
 
-		if (existsSync(filePath)) {
-			unlinkSync(filePath)
-			this.logger.log(`Deleted old avatar for user ${userId}`)
+		if (oldFilename) {
+			const oldFilePath = join(this.uploadsDir, oldFilename)
+			if (existsSync(oldFilePath)) {
+				unlinkSync(oldFilePath)
+				this.logger.log(`Deleted old avatar: ${oldFilename}`)
+			}
 		}
 
 		writeFileSync(filePath, Buffer.from(fileData))
-		this.logger.log(`Saved avatar for user ${userId}: ${filename}`)
+		this.logger.log(`Saved avatar: ${filename}`)
 
 		return filename
 	}
 
 	/**
-	 * Получить файл аватара пользователя
-	 * @param userId - ID пользователя
+	 * Получить файл аватара по имени файла
+	 * @param filename - Имя файла (UUID.webp)
 	 * @returns Данные файла или null, если файл не найден
 	 */
-	public async getAvatar(userId: string): Promise<Uint8Array | null> {
-		const filename = `${userId}.webp`
+	public async getAvatarByFilename(
+		filename: string,
+	): Promise<Uint8Array | null> {
 		const filePath = join(this.uploadsDir, filename)
+
+		this.logger.log(
+			`Looking for avatar: filename=${filename}, path=${filePath}`,
+		)
 
 		if (existsSync(filePath)) {
 			const fileData = readFileSync(filePath)
-			this.logger.log(`Found avatar for user ${userId}: ${filename}`)
+			this.logger.log(`Found avatar: ${filename}`)
 			return new Uint8Array(fileData)
 		}
 
-		this.logger.warn(`Avatar not found for user ${userId}`)
+		this.logger.warn(`Avatar not found at path: ${filePath}`)
 		return null
 	}
 
 	/**
-	 * Удалить файл аватара пользователя
-	 * @param userId - ID пользователя
+	 * Удалить файл аватара по имени файла
+	 * @param filename - Имя файла (UUID.webp)
 	 * @returns true, если файл был удален, false если не найден
 	 */
-	public async deleteAvatar(userId: string): Promise<boolean> {
-		const filename = `${userId}.webp`
+	public async deleteAvatarByFilename(filename: string): Promise<boolean> {
 		const filePath = join(this.uploadsDir, filename)
 
 		if (existsSync(filePath)) {
 			unlinkSync(filePath)
-			this.logger.log(`Deleted avatar for user ${userId}: ${filename}`)
+			this.logger.log(`Deleted avatar: ${filename}`)
 			return true
 		}
 
@@ -92,12 +101,11 @@ export class FilesRepository {
 	}
 
 	/**
-	 * Проверить существование файла аватара
-	 * @param userId - ID пользователя
+	 * Проверить существование файла аватара по имени файла
+	 * @param filename - Имя файла (UUID.webp)
 	 * @returns true, если файл существует
 	 */
-	public async avatarExists(userId: string): Promise<boolean> {
-		const filename = `${userId}.webp`
+	public async avatarExistsByFilename(filename: string): Promise<boolean> {
 		const filePath = join(this.uploadsDir, filename)
 
 		return existsSync(filePath)

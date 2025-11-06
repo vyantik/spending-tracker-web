@@ -12,7 +12,7 @@ export const protobufPackage = "files";
 
 export interface UploadAvatarRequest {
   file: Uint8Array;
-  userId: string;
+  oldFilename?: string | undefined;
 }
 
 export interface UploadAvatarResponse {
@@ -20,7 +20,7 @@ export interface UploadAvatarResponse {
 }
 
 export interface GetAvatarRequest {
-  userId: string;
+  filename: string;
 }
 
 export interface GetAvatarResponse {
