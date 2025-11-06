@@ -68,4 +68,13 @@ export class TransactionsRepository extends BaseRepository<
 	): Promise<Transaction> {
 		return await this.update({ id, userId }, dto)
 	}
+
+	public async getAllBankTransactions(
+		bankId: string,
+	): Promise<Transaction[]> {
+		return await this.model.findMany({
+			where: { bankId },
+			orderBy: { createdAt: 'desc' },
+		})
+	}
 }

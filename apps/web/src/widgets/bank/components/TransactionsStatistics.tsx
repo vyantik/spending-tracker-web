@@ -1,11 +1,20 @@
 'use client'
 
 import type { Transaction } from '@hermes/contracts'
-import type { ReactElement } from 'react'
+import { Download } from 'lucide-react'
+import { type ReactElement, useState } from 'react'
 
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/shared'
+import {
+	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	Skeleton,
+} from '@/shared'
 
 import { useGetTransactions } from '../hooks'
+import { transactionsService } from '../services'
 
 const categoryLabels: Record<string, string> = {
 	FOOD: 'Еда',
@@ -66,6 +75,26 @@ function calculateStatistics(transactions: Transaction[]) {
 
 export function TransactionsStatistics(): ReactElement {
 	const { transactions, isLoading } = useGetTransactions({ limit: 1000 })
+	const [isDownloading, setIsDownloading] = useState(false)
+
+	const handleDownloadExcel = async () => {
+		try {
+			setIsDownloading(true)
+			const blob = await transactionsService.generateTransactionsExcel()
+			const url = window.URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+			link.download = `transactions_${Date.now()}.xlsx`
+			document.body.appendChild(link)
+			link.click()
+			document.body.removeChild(link)
+			window.URL.revokeObjectURL(url)
+		} catch (error) {
+			console.error('Failed to download Excel file:', error)
+		} finally {
+			setIsDownloading(false)
+		}
+	}
 
 	if (isLoading) {
 		return (
@@ -93,7 +122,18 @@ export function TransactionsStatistics(): ReactElement {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Статистика транзакций</CardTitle>
+				<div className='flex items-center justify-between'>
+					<CardTitle>Статистика транзакций</CardTitle>
+					<Button
+						variant='outline'
+						size='sm'
+						onClick={handleDownloadExcel}
+						disabled={isDownloading}
+					>
+						<Download className='h-4 w-4' />
+						{isDownloading ? 'Загрузка...' : 'Скачать Excel'}
+					</Button>
+				</div>
 			</CardHeader>
 			<CardContent className='space-y-6'>
 				<div className='grid grid-cols-3 gap-4'>

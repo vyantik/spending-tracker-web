@@ -5,8 +5,11 @@ import type {
 	TransactionGetResponse,
 	TransactionUpdateResponse,
 } from '@hermes/contracts'
+import { TransactionData } from '@hermes/types/proto/files'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import type { User } from '@prisma/client'
+
+import { FilesService } from '../../../infra'
 
 import type { TransactionCreateRequest, TransactionUpdateRequest } from './dto'
 import { TransactionsRepository } from './transactions.repository'
@@ -15,6 +18,7 @@ import { TransactionsRepository } from './transactions.repository'
 export class TransactionsService {
 	public constructor(
 		private readonly transactionsRepository: TransactionsRepository,
+		private readonly filesService: FilesService,
 	) {}
 
 	public async getTransactions(
@@ -108,5 +112,31 @@ export class TransactionsService {
 		return {
 			message: 'ok',
 		}
+	}
+
+	public async generateTransactionsExcel(
+		bankId: string | null,
+	): Promise<{ file: Uint8Array; filename: string }> {
+		if (bankId === null) {
+			throw new BadRequestException('Пользователь еще не создал банк')
+		}
+
+		const transactions =
+			await this.transactionsRepository.getAllBankTransactions(bankId)
+
+		const transactionData: TransactionData[] = transactions.map(t => ({
+			id: t.id,
+			amount: t.amount.toNumber(),
+			description: t.description || '',
+			type: t.type,
+			category: t.category || undefined,
+			depositType: t.depositType || undefined,
+			createdAt: Math.floor(t.createdAt.getTime() / 1000),
+		}))
+
+		return await this.filesService.generateTransactionsExcel(
+			transactionData,
+			bankId,
+		)
 	}
 }

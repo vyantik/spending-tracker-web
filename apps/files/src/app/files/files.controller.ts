@@ -1,6 +1,8 @@
 import {
 	FilesServiceController,
 	FilesServiceControllerMethods,
+	GenerateTransactionsExcelRequest,
+	GenerateTransactionsExcelResponse,
 	GetAvatarRequest,
 	GetAvatarResponse,
 	UploadAvatarRequest,
@@ -44,6 +46,24 @@ export class FilesController implements FilesServiceController {
 
 		return {
 			file: fileData,
+		}
+	}
+
+	/**
+	 * Генерация Excel файла со статистикой транзакций
+	 */
+	public async generateTransactionsExcel(
+		request: GenerateTransactionsExcelRequest,
+	): Promise<GenerateTransactionsExcelResponse> {
+		const { file, filename } =
+			await this.filesService.generateTransactionsExcel(
+				request.transactions,
+				request.bankId,
+			)
+
+		return {
+			file,
+			filename,
 		}
 	}
 }

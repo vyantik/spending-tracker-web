@@ -5,6 +5,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common'
 import { RpcException } from '@nestjs/microservices'
+import ExcelJS from 'exceljs'
 import sharp from 'sharp'
 
 import { FilesRepository } from './files.repository'
@@ -184,5 +185,153 @@ export class FilesService {
 		}
 
 		return deleted
+	}
+
+	/**
+	 * Генерация Excel файла со статистикой транзакций
+	 * @param transactions - Массив транзакций
+	 * @param bankId - ID банка
+	 * @returns Данные Excel файла и имя файла
+	 */
+	public async generateTransactionsExcel(
+		transactions: Array<{
+			id: string
+			amount: number
+			description: string
+			type: string
+			category?: string | null
+			depositType?: string | null
+			createdAt: number
+		}>,
+		bankId: string,
+	): Promise<{ file: Uint8Array; filename: string }> {
+		this.logger.log(`Generating Excel file for bank: ${bankId}`)
+
+		try {
+			const workbook = new ExcelJS.Workbook()
+			const worksheet = workbook.addWorksheet('Статистика транзакций')
+
+			worksheet.columns = [
+				{ header: 'Показатель', key: 'indicator', width: 30 },
+				{ header: 'Значение', key: 'value', width: 20 },
+			]
+
+			const totalDeposit = transactions
+				.filter(t => t.type === 'DEPOSIT')
+				.reduce((sum, t) => sum + t.amount, 0)
+			const totalWithdraw = transactions
+				.filter(t => t.type === 'WITHDRAW')
+				.reduce((sum, t) => sum + t.amount, 0)
+			const balance = totalDeposit - totalWithdraw
+
+			const categoryStats = transactions.reduce(
+				(acc, t) => {
+					if (t.type === 'WITHDRAW' && t.category) {
+						if (!acc[t.category]) {
+							acc[t.category] = { amount: 0, count: 0 }
+						}
+						acc[t.category].amount += t.amount
+						acc[t.category].count += 1
+					} else if (t.type === 'DEPOSIT' && t.depositType) {
+						const key = `DEPOSIT_${t.depositType}`
+						if (!acc[key]) {
+							acc[key] = { amount: 0, count: 0 }
+						}
+						acc[key].amount += t.amount
+						acc[key].count += 1
+					}
+					return acc
+				},
+				{} as Record<string, { amount: number; count: number }>,
+			)
+
+			worksheet.addRow({
+				indicator: 'Общие пополнения',
+				value: totalDeposit,
+			})
+			worksheet.addRow({
+				indicator: 'Общие снятия',
+				value: totalWithdraw,
+			})
+			worksheet.addRow({ indicator: 'Баланс', value: balance })
+			worksheet.addRow({})
+
+			worksheet.addRow({
+				indicator: 'Распределение по категориям',
+				value: '',
+			})
+			Object.entries(categoryStats)
+				.sort((a, b) => b[1].amount - a[1].amount)
+				.forEach(([key, { amount, count }]) => {
+					const label = key.startsWith('DEPOSIT_')
+						? `Пополнение: ${key.replace('DEPOSIT_', '')}`
+						: key
+					worksheet.addRow({
+						indicator: label,
+						value: `${amount} (${count} транзакций)`,
+					})
+				})
+
+			worksheet.getRow(1).font = { bold: true }
+			worksheet.getRow(1).fill = {
+				type: 'pattern',
+				pattern: 'solid',
+				fgColor: { argb: 'FFE0E0E0' },
+			}
+
+			worksheet.getColumn('value').numFmt = '#,##0.00'
+
+			const detailsSheet = workbook.addWorksheet('Детальные транзакции')
+			detailsSheet.columns = [
+				{ header: 'ID', key: 'id', width: 36 },
+				{ header: 'Тип', key: 'type', width: 12 },
+				{ header: 'Сумма', key: 'amount', width: 15 },
+				{ header: 'Описание', key: 'description', width: 40 },
+				{ header: 'Категория', key: 'category', width: 20 },
+				{ header: 'Тип пополнения', key: 'depositType', width: 20 },
+				{ header: 'Дата создания', key: 'createdAt', width: 20 },
+			]
+
+			transactions
+				.sort((a, b) => b.createdAt - a.createdAt)
+				.forEach(transaction => {
+					const createdAt = new Date(transaction.createdAt * 1000)
+					detailsSheet.addRow({
+						id: transaction.id,
+						type:
+							transaction.type === 'DEPOSIT'
+								? 'Пополнение'
+								: 'Снятие',
+						amount: transaction.amount,
+						description: transaction.description || '',
+						category: transaction.category || '',
+						depositType: transaction.depositType || '',
+						createdAt: createdAt.toLocaleString('ru-RU'),
+					})
+				})
+
+			detailsSheet.getRow(1).font = { bold: true }
+			detailsSheet.getRow(1).fill = {
+				type: 'pattern',
+				pattern: 'solid',
+				fgColor: { argb: 'FFE0E0E0' },
+			}
+
+			detailsSheet.getColumn('amount').numFmt = '#,##0.00'
+
+			const buffer = await workbook.xlsx.writeBuffer()
+			const filename = `transactions_${bankId}_${Date.now()}.xlsx`
+
+			this.logger.log(`Excel file generated successfully: ${filename}`)
+			return {
+				file: new Uint8Array(buffer),
+				filename,
+			}
+		} catch (error) {
+			this.logger.error('Error generating Excel file', error)
+			throw new RpcException(
+				new BadRequestException('Failed to generate Excel file'),
+			)
+		}
 	}
 }

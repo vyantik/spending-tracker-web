@@ -52,6 +52,29 @@ class TransactionsService {
 			`/banks/transactions/${transactionId}`,
 		)
 	}
+
+	public async generateTransactionsExcel(): Promise<Blob> {
+		const baseUrl = process.env.NEXT_PUBLIC_API_URL as string
+		const url = `${baseUrl}/banks/transactions/export/excel`
+		const token =
+			typeof window !== 'undefined'
+				? localStorage.getItem('access_token')
+				: null
+
+		const response = await fetch(url, {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				...(token && { Authorization: `Bearer ${token}` }),
+			},
+		})
+
+		if (!response.ok) {
+			throw new Error('Failed to generate Excel file')
+		}
+
+		return await response.blob()
+	}
 }
 
 export const transactionsService = new TransactionsService()

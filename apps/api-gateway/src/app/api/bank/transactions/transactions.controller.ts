@@ -10,6 +10,7 @@ import {
 	Patch,
 	Post,
 	Query,
+	Res,
 } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
@@ -19,6 +20,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger'
 import type { User } from '@prisma/client'
+import type { Response } from 'express'
 import z from 'zod'
 
 import { Authorized, Protected } from '../../../common'
@@ -130,5 +132,39 @@ export class TransactionsController {
 			id: transactionId,
 		})
 		return this.transactionsService.deleteTransaction(transactionId, userId)
+	}
+
+	@ApiOperation({
+		summary: 'Generate Excel file with transactions statistics',
+	})
+	@ApiOkResponse({
+		description: 'Excel file with transactions statistics',
+		content: {
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+				{},
+		},
+	})
+	@ApiBadRequestResponse({
+		...BAD_REQUEST_BANK_NOT_CREATED_EXAMPLE,
+	})
+	@HttpCode(HttpStatus.OK)
+	@Protected()
+	@Get('/export/excel')
+	public async generateTransactionsExcel(
+		@Authorized('bankId') bankId: string | null,
+		@Res() res: Response,
+	): Promise<void> {
+		const { file, filename } =
+			await this.transactionsService.generateTransactionsExcel(bankId)
+
+		res.setHeader(
+			'Content-Type',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		)
+		res.setHeader(
+			'Content-Disposition',
+			`attachment; filename="${filename}"`,
+		)
+		res.send(Buffer.from(file))
 	}
 }

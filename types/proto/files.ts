@@ -27,12 +27,34 @@ export interface GetAvatarResponse {
   file: Uint8Array;
 }
 
+export interface GenerateTransactionsExcelRequest {
+  transactions: TransactionData[];
+  bankId: string;
+}
+
+export interface TransactionData {
+  id: string;
+  amount: number;
+  description: string;
+  type: string;
+  category?: string | undefined;
+  depositType?: string | undefined;
+  createdAt: number;
+}
+
+export interface GenerateTransactionsExcelResponse {
+  file: Uint8Array;
+  filename: string;
+}
+
 export const FILES_PACKAGE_NAME = "files";
 
 export interface FilesServiceClient {
   uploadAvatar(request: UploadAvatarRequest): Observable<UploadAvatarResponse>;
 
   getAvatar(request: GetAvatarRequest): Observable<GetAvatarResponse>;
+
+  generateTransactionsExcel(request: GenerateTransactionsExcelRequest): Observable<GenerateTransactionsExcelResponse>;
 }
 
 export interface FilesServiceController {
@@ -41,11 +63,18 @@ export interface FilesServiceController {
   ): Promise<UploadAvatarResponse> | Observable<UploadAvatarResponse> | UploadAvatarResponse;
 
   getAvatar(request: GetAvatarRequest): Promise<GetAvatarResponse> | Observable<GetAvatarResponse> | GetAvatarResponse;
+
+  generateTransactionsExcel(
+    request: GenerateTransactionsExcelRequest,
+  ):
+    | Promise<GenerateTransactionsExcelResponse>
+    | Observable<GenerateTransactionsExcelResponse>
+    | GenerateTransactionsExcelResponse;
 }
 
 export function FilesServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["uploadAvatar", "getAvatar"];
+    const grpcMethods: string[] = ["uploadAvatar", "getAvatar", "generateTransactionsExcel"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("FilesService", method)(constructor.prototype[method], method, descriptor);

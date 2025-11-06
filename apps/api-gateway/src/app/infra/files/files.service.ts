@@ -2,8 +2,11 @@ import {
 	FILES_PACKAGE_NAME,
 	FILES_SERVICE_NAME,
 	FilesServiceClient,
+	GenerateTransactionsExcelRequest,
+	GenerateTransactionsExcelResponse,
 	GetAvatarRequest,
 	GetAvatarResponse,
+	TransactionData,
 	UploadAvatarRequest,
 	UploadAvatarResponse,
 } from '@hermes/types/proto/files'
@@ -156,6 +159,70 @@ export class FilesService implements OnModuleInit {
 				error,
 			)
 			throw new NotFoundException('Avatar not found')
+		}
+	}
+
+	/**
+	 * Генерация Excel файла со статистикой транзакций
+	 * @param transactions - Массив транзакций
+	 * @param bankId - ID банка
+	 * @returns Данные Excel файла и имя файла
+	 * @throws BadRequestException если не удалось сгенерировать файл
+	 */
+	public async generateTransactionsExcel(
+		transactions: TransactionData[],
+		bankId: string,
+	): Promise<{ file: Uint8Array; filename: string }> {
+		const request: GenerateTransactionsExcelRequest = {
+			transactions,
+			bankId,
+		}
+
+		try {
+			const response: GenerateTransactionsExcelResponse =
+				await firstValueFrom(
+					this.filesService.generateTransactionsExcel(request).pipe(
+						catchError(error => {
+							this.logger.error(
+								'Failed to generate transactions Excel:',
+								error,
+							)
+
+							if (error?.code === 3 || error?.status === 400) {
+								return throwError(
+									() =>
+										new BadRequestException(
+											error.message ||
+												'Failed to generate Excel file',
+										),
+								)
+							}
+
+							return throwError(
+								() =>
+									new BadRequestException(
+										error.message ||
+											'Failed to generate Excel file',
+									),
+							)
+						}),
+					),
+				)
+
+			return {
+				file: response.file,
+				filename: response.filename,
+			}
+		} catch (error) {
+			if (error instanceof BadRequestException) {
+				throw error
+			}
+
+			this.logger.error(
+				'Unexpected error generating transactions Excel:',
+				error,
+			)
+			throw new BadRequestException('Failed to generate Excel file')
 		}
 	}
 }

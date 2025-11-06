@@ -5,6 +5,7 @@ package files;
 service FilesService {
   rpc UploadAvatar (UploadAvatarRequest) returns (UploadAvatarResponse);
   rpc GetAvatar (GetAvatarRequest) returns (GetAvatarResponse);
+  rpc GenerateTransactionsExcel (GenerateTransactionsExcelRequest) returns (GenerateTransactionsExcelResponse);
 }
 
 message UploadAvatarRequest {
@@ -22,4 +23,24 @@ message GetAvatarRequest {
 
 message GetAvatarResponse {
   bytes file = 1;
+}
+
+message GenerateTransactionsExcelRequest {
+  repeated TransactionData transactions = 1;
+  string bankId = 2;
+}
+
+message TransactionData {
+  string id = 1;
+  double amount = 2;
+  string description = 3;
+  string type = 4;
+  optional string category = 5;
+  optional string depositType = 6;
+  int64 createdAt = 7;
+}
+
+message GenerateTransactionsExcelResponse {
+  bytes file = 1;
+  string filename = 2;
 }
