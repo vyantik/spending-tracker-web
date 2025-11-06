@@ -1,6 +1,7 @@
 import type {
 	BankGetTransactionsResponse,
 	TransactionCreateResponse,
+	TransactionDeleteResponse,
 	TransactionGetResponse,
 	TransactionUpdateResponse,
 } from '@hermes/contracts'
@@ -33,8 +34,12 @@ export class TransactionsService {
 		const totalPages = Math.ceil(total / limit)
 		return {
 			transactions: transactions.map(transaction => ({
-				...transaction,
+				id: transaction.id,
 				amount: transaction.amount.toNumber(),
+				description: transaction.description,
+				type: transaction.type,
+				category: transaction.category,
+				depositType: transaction.depositType,
 			})),
 			total,
 			page,
@@ -79,9 +84,29 @@ export class TransactionsService {
 			id: transactionId,
 			userId: userId,
 		})
+		if (!transaction) {
+			throw new BadRequestException('Транзакция не найдена')
+		}
 		return {
-			...transaction,
+			id: transaction.id,
 			amount: transaction.amount.toNumber(),
+			description: transaction.description,
+			type: transaction.type,
+			category: transaction.category,
+			depositType: transaction.depositType,
+		}
+	}
+
+	public async deleteTransaction(
+		transactionId: string,
+		userId: string,
+	): Promise<TransactionDeleteResponse> {
+		await this.transactionsRepository.delete({
+			id: transactionId,
+			userId: userId,
+		})
+		return {
+			message: 'ok',
 		}
 	}
 }

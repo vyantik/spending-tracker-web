@@ -18,6 +18,14 @@ const categoryLabels: Record<string, string> = {
 	OTHER: 'Другое',
 }
 
+const depositTypeLabels: Record<string, string> = {
+	SALARY: 'Зарплата',
+	GIFT: 'Подарок',
+	TRANSFER: 'Перевод',
+	REFUND: 'Возврат',
+	OTHER: 'Другое',
+}
+
 function calculateStatistics(transactions: Transaction[]) {
 	const totalDeposit = transactions
 		.filter(t => t.type === 'DEPOSIT')
@@ -29,11 +37,20 @@ function calculateStatistics(transactions: Transaction[]) {
 
 	const categoryStats = transactions.reduce(
 		(acc, t) => {
-			if (!acc[t.category]) {
-				acc[t.category] = { amount: 0, count: 0 }
+			if (t.type === 'WITHDRAW' && t.category) {
+				if (!acc[t.category]) {
+					acc[t.category] = { amount: 0, count: 0 }
+				}
+				acc[t.category].amount += t.amount
+				acc[t.category].count += 1
+			} else if (t.type === 'DEPOSIT' && t.depositType) {
+				const key = `DEPOSIT_${t.depositType}`
+				if (!acc[key]) {
+					acc[key] = { amount: 0, count: 0 }
+				}
+				acc[key].amount += t.amount
+				acc[key].count += 1
 			}
-			acc[t.category].amount += t.amount
-			acc[t.category].count += 1
 			return acc
 		},
 		{} as Record<string, { amount: number; count: number }>,
@@ -127,37 +144,46 @@ export function TransactionsStatistics(): ReactElement {
 					<div className='space-y-3'>
 						{Object.entries(stats.categoryStats)
 							.sort((a, b) => b[1].amount - a[1].amount)
-							.map(([category, { amount, count }]) => (
-								<div key={category} className='space-y-2'>
-									<div className='flex items-center justify-between'>
-										<span className='text-sm font-medium'>
-											{categoryLabels[category] ||
-												category}
-										</span>
-										<span className='text-sm text-muted-foreground'>
-											{amount.toLocaleString('ru-RU', {
-												style: 'currency',
-												currency: 'RUB',
-												minimumFractionDigits: 0,
-											})}{' '}
-											({count} транзакций)
-										</span>
+							.map(([key, { amount, count }]) => {
+								const label = key.startsWith('DEPOSIT_')
+									? depositTypeLabels[
+											key.replace('DEPOSIT_', '')
+										] || key
+									: categoryLabels[key] || key
+								return (
+									<div key={key} className='space-y-2'>
+										<div className='flex items-center justify-between'>
+											<span className='text-sm font-medium'>
+												{label}
+											</span>
+											<span className='text-sm text-muted-foreground'>
+												{amount.toLocaleString(
+													'ru-RU',
+													{
+														style: 'currency',
+														currency: 'RUB',
+														minimumFractionDigits: 0,
+													},
+												)}{' '}
+												({count} транзакций)
+											</span>
+										</div>
+										<div className='h-2 w-full rounded-full bg-accent overflow-hidden'>
+											<div
+												className='h-full bg-primary transition-all'
+												style={{
+													width: `${
+														(maxCategoryAmount > 0
+															? amount /
+																maxCategoryAmount
+															: 0) * 100
+													}%`,
+												}}
+											/>
+										</div>
 									</div>
-									<div className='h-2 w-full rounded-full bg-accent overflow-hidden'>
-										<div
-											className='h-full bg-primary transition-all'
-											style={{
-												width: `${
-													(maxCategoryAmount > 0
-														? amount /
-															maxCategoryAmount
-														: 0) * 100
-												}%`,
-											}}
-										/>
-									</div>
-								</div>
-							))}
+								)
+							})}
 						{Object.keys(stats.categoryStats).length === 0 && (
 							<p className='text-sm text-muted-foreground text-center py-4'>
 								Нет транзакций для отображения

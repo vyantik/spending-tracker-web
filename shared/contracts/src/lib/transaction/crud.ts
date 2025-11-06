@@ -1,25 +1,51 @@
 import z from 'zod'
 
 import {
+	DepositType,
 	TransactionCategory,
 	TransactionSchema,
 	TransactionType,
 } from './transaction'
 
-export const TransactionCreateRequestSchema = z.object({
-	amount: z
-		.number()
-		.min(0, { message: 'Сумма должна быть больше или равна 0' }),
-	description: z
-		.string()
-		.min(1, { message: 'Описание не может быть пустым' })
-		.max(1000, {
-			message: 'Описание должно содержать максимум 1000 символов',
-		})
-		.optional(),
-	type: TransactionType,
-	category: TransactionCategory,
-})
+export const TransactionCreateRequestSchema = z
+	.object({
+		amount: z
+			.number()
+			.min(0, { message: 'Сумма должна быть больше или равна 0' }),
+		description: z
+			.string()
+			.max(1000, {
+				message: 'Описание должно содержать максимум 1000 символов',
+			})
+			.optional(),
+		type: TransactionType,
+		category: TransactionCategory.optional(),
+		depositType: DepositType.optional(),
+	})
+	.refine(
+		data => {
+			if (data.type === 'DEPOSIT') {
+				return data.depositType !== undefined
+			}
+			return true
+		},
+		{
+			message: 'Тип пополнения обязателен для пополнений',
+			path: ['depositType'],
+		},
+	)
+	.refine(
+		data => {
+			if (data.type === 'WITHDRAW') {
+				return data.category !== undefined
+			}
+			return true
+		},
+		{
+			message: 'Категория обязательна для снятий',
+			path: ['category'],
+		},
+	)
 
 export const TransactionCreateResponseSchema = z.object({
 	message: z.string(),
@@ -39,13 +65,13 @@ export const TransactionUpdateRequestSchema = z.object({
 		.optional(),
 	description: z
 		.string()
-		.min(1, { message: 'Описание не может быть пустым' })
 		.max(1000, {
 			message: 'Описание должно содержать максимум 1000 символов',
 		})
 		.optional(),
 	type: TransactionType.optional(),
 	category: TransactionCategory.optional(),
+	depositType: DepositType.optional(),
 })
 
 export const TransactionUpdateResponseSchema = z.object({

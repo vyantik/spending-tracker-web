@@ -12,7 +12,9 @@ import {
 	Skeleton,
 } from '@/shared'
 
-import { useGetTransactions } from '../hooks'
+import { useDeleteTransactionMutation, useGetTransactions } from '../hooks'
+
+import { UpdateTransactionForm } from './UpdateTransactionForm'
 
 const categoryLabels: Record<string, string> = {
 	FOOD: 'Еда',
@@ -25,6 +27,14 @@ const categoryLabels: Record<string, string> = {
 	OTHER: 'Другое',
 }
 
+const depositTypeLabels: Record<string, string> = {
+	SALARY: 'Зарплата',
+	GIFT: 'Подарок',
+	TRANSFER: 'Перевод',
+	REFUND: 'Возврат',
+	OTHER: 'Другое',
+}
+
 const typeLabels: Record<string, string> = {
 	DEPOSIT: 'Пополнение',
 	WITHDRAW: 'Снятие',
@@ -32,6 +42,7 @@ const typeLabels: Record<string, string> = {
 
 export function TransactionsList(): ReactElement {
 	const [page, setPage] = useState(1)
+	const [editingId, setEditingId] = useState<string | null>(null)
 	const limit = 10
 	const {
 		transactions,
@@ -39,6 +50,8 @@ export function TransactionsList(): ReactElement {
 		page: currentPage,
 		isLoading,
 	} = useGetTransactions({ page, limit })
+	const { deleteTransaction, isLoadingDelete } =
+		useDeleteTransactionMutation()
 
 	if (isLoading) {
 		return (
@@ -71,56 +84,108 @@ export function TransactionsList(): ReactElement {
 					<>
 						<div className='space-y-2'>
 							{transactions.map(transaction => (
-								<div
-									key={transaction.id}
-									className='flex items-center justify-between p-3 rounded-lg border bg-card'
-								>
-									<div className='flex-1 space-y-1'>
-										<div className='flex items-center gap-2'>
-											<span
-												className={`text-sm font-medium ${
-													transaction.type ===
+								<div key={transaction.id} className='space-y-2'>
+									{editingId === transaction.id ? (
+										<UpdateTransactionForm
+											transaction={transaction}
+											onSuccess={() => setEditingId(null)}
+										/>
+									) : (
+										<div className='flex items-center justify-between p-3 rounded-lg border bg-card'>
+											<div className='flex-1 space-y-1'>
+												<div className='flex items-center gap-2'>
+													<span
+														className={`text-sm font-medium ${
+															transaction.type ===
+															'DEPOSIT'
+																? 'text-green-600'
+																: 'text-red-600'
+														}`}
+													>
+														{typeLabels[
+															transaction.type
+														] || transaction.type}
+													</span>
+													{transaction.type ===
 													'DEPOSIT'
-														? 'text-green-600'
-														: 'text-red-600'
-												}`}
-											>
-												{typeLabels[transaction.type] ||
-													transaction.type}
-											</span>
-											<span className='text-xs text-muted-foreground'>
-												{categoryLabels[
-													transaction.category
-												] || transaction.category}
-											</span>
+														? transaction.depositType && (
+																<span className='text-xs text-muted-foreground'>
+																	{depositTypeLabels[
+																		transaction
+																			.depositType
+																	] ||
+																		transaction.depositType}
+																</span>
+															)
+														: transaction.category && (
+																<span className='text-xs text-muted-foreground'>
+																	{categoryLabels[
+																		transaction
+																			.category
+																	] ||
+																		transaction.category}
+																</span>
+															)}
+												</div>
+												{transaction.description && (
+													<p className='text-sm text-muted-foreground'>
+														{
+															transaction.description
+														}
+													</p>
+												)}
+											</div>
+											<div className='flex items-center gap-2'>
+												<div className='text-right'>
+													<p
+														className={`font-semibold ${
+															transaction.type ===
+															'DEPOSIT'
+																? 'text-green-600'
+																: 'text-red-600'
+														}`}
+													>
+														{transaction.type ===
+														'DEPOSIT'
+															? '+'
+															: '-'}
+														{transaction.amount.toLocaleString(
+															'ru-RU',
+															{
+																style: 'currency',
+																currency: 'RUB',
+																minimumFractionDigits: 0,
+															},
+														)}
+													</p>
+												</div>
+												<Button
+													variant='outline'
+													size='sm'
+													onClick={() =>
+														setEditingId(
+															transaction.id,
+														)
+													}
+													disabled={isLoadingDelete}
+												>
+													Редактировать
+												</Button>
+												<Button
+													variant='destructive'
+													size='sm'
+													onClick={() =>
+														deleteTransaction(
+															transaction.id,
+														)
+													}
+													disabled={isLoadingDelete}
+												>
+													Удалить
+												</Button>
+											</div>
 										</div>
-										{transaction.description && (
-											<p className='text-sm text-muted-foreground'>
-												{transaction.description}
-											</p>
-										)}
-									</div>
-									<div className='text-right'>
-										<p
-											className={`font-semibold ${
-												transaction.type === 'DEPOSIT'
-													? 'text-green-600'
-													: 'text-red-600'
-											}`}
-										>
-											{transaction.type === 'DEPOSIT'
-												? '+'
-												: '-'}
-											{transaction.amount.toLocaleString(
-												'ru-RU',
-												{
-													style: 'currency',
-													currency: 'RUB',
-													minimumFractionDigits: 0,
-												},
-											)}
-										</p>
-									</div>
+									)}
 								</div>
 							))}
 						</div>

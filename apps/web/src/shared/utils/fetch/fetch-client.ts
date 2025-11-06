@@ -138,7 +138,7 @@ export class FetchClient {
 
 	public async post<T>(
 		endpoint: string,
-		body?: Record<string, string>,
+		body?: Record<string, any>,
 		options: RequestOptions = {},
 	): Promise<T> {
 		return await this.request(endpoint, 'POST', {

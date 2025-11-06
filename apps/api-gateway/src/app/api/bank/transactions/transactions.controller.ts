@@ -2,6 +2,7 @@ import { TransactionGetRequestSchema } from '@hermes/contracts'
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	HttpStatus,
@@ -27,6 +28,7 @@ import { BankGetTransactionsResponse } from '../dto'
 import {
 	TransactionCreateRequest,
 	TransactionCreateResponse,
+	TransactionDeleteResponse,
 	TransactionGetResponse,
 	TransactionUpdateRequest,
 	TransactionUpdateResponse,
@@ -87,7 +89,7 @@ export class TransactionsController {
 	@Patch('/:transactionId')
 	public async updateTransaction(
 		@Authorized('id') userId: string,
-		@Param() transactionId: string,
+		@Param('transactionId') transactionId: string,
 		@Body() dto: TransactionUpdateRequest,
 	): Promise<TransactionUpdateResponse> {
 		await z.parseAsync(TransactionGetRequestSchema, {
@@ -100,18 +102,33 @@ export class TransactionsController {
 		)
 	}
 
-	@ApiOperation({ summary: 'Add transactions' })
+	@ApiOperation({ summary: 'Get transaction' })
 	@ApiCreatedResponse({ type: TransactionGetResponse })
 	@HttpCode(HttpStatus.OK)
 	@Protected()
 	@Get('/:transactionId')
 	public async getTransaction(
 		@Authorized('id') userId: string,
-		@Param() transactionId: string,
+		@Param('transactionId') transactionId: string,
 	): Promise<TransactionGetResponse> {
 		await z.parseAsync(TransactionGetRequestSchema, {
 			id: transactionId,
 		})
 		return this.transactionsService.getTransaction(transactionId, userId)
+	}
+
+	@ApiOperation({ summary: 'Delete transaction' })
+	@ApiOkResponse({ type: TransactionDeleteResponse })
+	@HttpCode(HttpStatus.OK)
+	@Protected()
+	@Delete('/:transactionId')
+	public async deleteTransaction(
+		@Authorized('id') userId: string,
+		@Param('transactionId') transactionId: string,
+	): Promise<TransactionDeleteResponse> {
+		await z.parseAsync(TransactionGetRequestSchema, {
+			id: transactionId,
+		})
+		return this.transactionsService.deleteTransaction(transactionId, userId)
 	}
 }

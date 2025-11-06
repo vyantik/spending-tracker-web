@@ -4,6 +4,8 @@ import {
 	BankInfo,
 	BankSkeleton,
 	CreateBankForm,
+	CreateDepositForm,
+	CreateWithdrawForm,
 	TransactionsList,
 	TransactionsStatistics,
 	UpdateBankForm,
@@ -15,7 +17,7 @@ import { useProfile } from '@/shared'
 import { useGetBank } from '../hooks'
 
 export function Banks(): ReactElement | undefined {
-	const { user, isLoadingUser } = useProfile()
+	const { isLoadingUser } = useProfile()
 	const { bank, isLoadingBank, isBankNotFound } = useGetBank()
 
 	if (isLoadingUser) return
@@ -38,6 +40,10 @@ export function Banks(): ReactElement | undefined {
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 							<BankInfo bank={bank} />
 							<UpdateBankForm bank={bank} />
+						</div>
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+							<CreateDepositForm />
+							<CreateWithdrawForm />
 						</div>
 						<TransactionsStatistics />
 						<TransactionsList />

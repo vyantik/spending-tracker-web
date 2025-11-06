@@ -50,8 +50,9 @@ model Transaction {
   amount      Decimal @db.Decimal(10, 2)
   description String  @default("") @db.VarChar(1000)
 
-  type     TransactionType
-  category TransactionCategory
+  type        TransactionType
+  category    TransactionCategory?
+  depositType DepositType?
 
   bank   Bank   @relation(fields: [bankId], references: [id])
   bankId String @map("bank_id")
@@ -82,6 +83,16 @@ enum TransactionType {
   DEPOSIT
 
   @@map("transaction_type")
+}
+
+enum DepositType {
+  SALARY
+  GIFT
+  TRANSFER
+  REFUND
+  OTHER
+
+  @@map("deposit_type")
 }
 
 enum UserRole {

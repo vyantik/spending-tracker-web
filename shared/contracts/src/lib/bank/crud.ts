@@ -7,7 +7,6 @@ export const BankCreateRequestSchema = z.object({
 		.max(32, { message: 'Название должно содержать максимум 32 символа' }),
 	description: z
 		.string()
-		.min(1, { message: 'Описание не может быть пустым' })
 		.max(1000, {
 			message: 'Описание должно содержать максимум 1000 символов',
 		})
@@ -29,7 +28,6 @@ export const BankUpdateRequestSchema = z.object({
 		.optional(),
 	description: z
 		.string()
-		.min(1, { message: 'Описание не может быть пустым' })
 		.max(1000, {
 			message: 'Описание должно содержать максимум 1000 символов',
 		})

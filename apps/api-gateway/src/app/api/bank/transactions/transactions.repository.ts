@@ -41,8 +41,12 @@ export class TransactionsRepository extends BaseRepository<
 		userId: string,
 		dto: TransactionCreateRequest,
 	): Promise<Transaction> {
-		return await this.create({
-			...dto,
+		const data: Prisma.TransactionCreateInput = {
+			amount: dto.amount,
+			description: dto.description || '',
+			type: dto.type,
+			category: dto.category || null,
+			depositType: dto.depositType || null,
 			bank: {
 				connect: {
 					id: bankId,
@@ -53,7 +57,8 @@ export class TransactionsRepository extends BaseRepository<
 					id: userId,
 				},
 			},
-		})
+		}
+		return await this.create(data)
 	}
 
 	public async updateTransaction(
