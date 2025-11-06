@@ -5,6 +5,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common'
 import { RpcException } from '@nestjs/microservices'
+import sharp from 'sharp'
 
 import { FilesRepository } from './files.repository'
 
@@ -85,6 +86,30 @@ export class FilesService {
 	}
 
 	/**
+	 * Обработка изображения: обрезка до 500x500 и конвертация в WebP с качеством 80%
+	 * @param fileData - Данные файла
+	 * @returns Обработанные данные изображения в формате WebP
+	 */
+	private async processImage(fileData: Uint8Array): Promise<Uint8Array> {
+		try {
+			const processedImage = await sharp(fileData)
+				.resize(500, 500, {
+					fit: 'cover',
+					position: 'center',
+				})
+				.webp({ quality: 80 })
+				.toBuffer()
+
+			return new Uint8Array(processedImage)
+		} catch (error) {
+			this.logger.error('Error processing image', error)
+			throw new RpcException(
+				new BadRequestException('Failed to process image'),
+			)
+		}
+	}
+
+	/**
 	 * Загрузить аватар пользователя
 	 * @param userId - ID пользователя
 	 * @param fileData - Данные файла
@@ -107,10 +132,12 @@ export class FilesService {
 			)
 		}
 
+		const processedImage = await this.processImage(fileData)
+
 		const filename = await this.filesRepository.saveAvatar(
 			userId,
-			fileData,
-			extension,
+			processedImage,
+			'webp',
 		)
 
 		this.logger.log(

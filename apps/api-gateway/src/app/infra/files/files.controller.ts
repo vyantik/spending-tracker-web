@@ -27,14 +27,12 @@ export class FilesController {
 	@ApiOperation({ summary: 'Get user avatar by filename' })
 	@ApiParam({
 		name: 'filename',
-		description: 'Avatar filename (e.g., userId.jpg)',
+		description: 'Avatar filename (e.g., userId.webp)',
 		type: 'string',
 	})
 	@ApiOkResponse({
 		description: 'Avatar file',
 		content: {
-			'image/jpeg': {},
-			'image/png': {},
 			'image/webp': {},
 		},
 	})
@@ -47,24 +45,7 @@ export class FilesController {
 
 		const fileData = await this.filesService.getAvatar(userId)
 
-		const extension = filename.split('.').pop()?.toLowerCase()
-		let contentType = 'image/jpeg'
-
-		switch (extension) {
-			case 'png':
-				contentType = 'image/png'
-				break
-			case 'webp':
-				contentType = 'image/webp'
-				break
-			case 'jpg':
-			case 'jpeg':
-			default:
-				contentType = 'image/jpeg'
-				break
-		}
-
-		res.setHeader('Content-Type', contentType)
+		res.setHeader('Content-Type', 'image/webp')
 		res.setHeader('Content-Length', fileData.length)
 		res.send(Buffer.from(fileData))
 	}

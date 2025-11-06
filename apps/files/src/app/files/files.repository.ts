@@ -60,17 +60,13 @@ export class FilesRepository {
 	 * @returns Данные файла или null, если файл не найден
 	 */
 	public async getAvatar(userId: string): Promise<Uint8Array | null> {
-		const extensions = ['jpg', 'jpeg', 'png', 'webp']
+		const filename = `${userId}.webp`
+		const filePath = join(this.uploadsDir, filename)
 
-		for (const ext of extensions) {
-			const filename = `${userId}.${ext}`
-			const filePath = join(this.uploadsDir, filename)
-
-			if (existsSync(filePath)) {
-				const fileData = readFileSync(filePath)
-				this.logger.log(`Found avatar for user ${userId}: ${filename}`)
-				return new Uint8Array(fileData)
-			}
+		if (existsSync(filePath)) {
+			const fileData = readFileSync(filePath)
+			this.logger.log(`Found avatar for user ${userId}: ${filename}`)
+			return new Uint8Array(fileData)
 		}
 
 		this.logger.warn(`Avatar not found for user ${userId}`)
@@ -83,19 +79,13 @@ export class FilesRepository {
 	 * @returns true, если файл был удален, false если не найден
 	 */
 	public async deleteAvatar(userId: string): Promise<boolean> {
-		const extensions = ['jpg', 'jpeg', 'png', 'webp']
+		const filename = `${userId}.webp`
+		const filePath = join(this.uploadsDir, filename)
 
-		for (const ext of extensions) {
-			const filename = `${userId}.${ext}`
-			const filePath = join(this.uploadsDir, filename)
-
-			if (existsSync(filePath)) {
-				unlinkSync(filePath)
-				this.logger.log(
-					`Deleted avatar for user ${userId}: ${filename}`,
-				)
-				return true
-			}
+		if (existsSync(filePath)) {
+			unlinkSync(filePath)
+			this.logger.log(`Deleted avatar for user ${userId}: ${filename}`)
+			return true
 		}
 
 		return false
@@ -107,17 +97,9 @@ export class FilesRepository {
 	 * @returns true, если файл существует
 	 */
 	public async avatarExists(userId: string): Promise<boolean> {
-		const extensions = ['jpg', 'jpeg', 'png', 'webp']
+		const filename = `${userId}.webp`
+		const filePath = join(this.uploadsDir, filename)
 
-		for (const ext of extensions) {
-			const filename = `${userId}.${ext}`
-			const filePath = join(this.uploadsDir, filename)
-
-			if (existsSync(filePath)) {
-				return true
-			}
-		}
-
-		return false
+		return existsSync(filePath)
 	}
 }
