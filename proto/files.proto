@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package files;
+
+service FilesService {
+  rpc UploadAvatar (UploadAvatarRequest) returns (UploadAvatarResponse);
+  rpc GetAvatar (GetAvatarRequest) returns (GetAvatarResponse);
+}
+
+message UploadAvatarRequest {
+  bytes file = 1;
+  string user_id = 2;
+}
+
+message UploadAvatarResponse {
+  string filename = 1;
+}
+
+message GetAvatarRequest {
+  string user_id = 1;
+}
+
+message GetAvatarResponse {
+  bytes file = 1;
+}

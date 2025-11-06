@@ -38,7 +38,7 @@
 			"options": {
 				"targetName": "test"
 			},
-			"exclude": ["apps/api-gateway-e2e/**/*"]
+			"exclude": ["apps/api-gateway-e2e/**/*", "apps/files-e2e/**/*"]
 		},
 		{
 			"plugin": "@nx/next/plugin",
@@ -57,6 +57,19 @@
 			"application": {
 				"style": "css",
 				"linter": "eslint"
+			}
+		}
+	},
+	"targetDefaults": {
+		"build": {
+			"options": {
+				"assets": [
+					{
+						"glob": "*.proto",
+						"input": "proto",
+						"output": "proto"
+					}
+				]
 			}
 		}
 	}

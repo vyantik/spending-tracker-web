@@ -16,7 +16,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@hermes/contracts": ["shared/contracts/src/index.ts"],
-			"@hermes/dtos": ["shared/dtos/src/index.ts"]
+			"@hermes/dtos": ["shared/dtos/src/index.ts"],
+			"@hermes/types/proto/*": ["types/proto/*"]
 		}
 	},
 	"exclude": ["node_modules", "tmp"]
