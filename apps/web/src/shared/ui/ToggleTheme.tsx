@@ -16,7 +16,7 @@ export function ToggleTheme() {
 	const { setTheme } = useTheme()
 
 	return (
-		<div className='absolute right-5 top-20'>
+		<div className='absolute right-5 top-30'>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant='outline' size='icon'>

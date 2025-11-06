@@ -13,7 +13,7 @@ export const Header = (): ReactElement => {
 	const { user, isLoadingUser } = useProfile()
 
 	return (
-		<header className='absolute top-0 left-0 w-screen h-[7vh] p-4 flex bg-white dark:bg-[#161616]'>
+		<header className='sticky top-0 z-50 w-full h-[7vh] p-4 flex items-center bg-white dark:bg-[#161616] border-b border-gray-200 dark:border-gray-800'>
 			<div className='mr-auto'>
 				<Button variant='default'>ХУЙ</Button>
 			</div>

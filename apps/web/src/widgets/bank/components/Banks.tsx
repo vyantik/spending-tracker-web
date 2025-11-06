@@ -24,32 +24,32 @@ export function Banks(): ReactElement | undefined {
 
 	if (isLoadingBank) {
 		return (
-			<div className='w-screen h-screen flex justify-center items-center pt-[7vh]'>
+			<div className='w-full h-full flex justify-center items-center'>
 				<BankSkeleton />
 			</div>
 		)
 	}
 
 	return (
-		<div className='w-screen min-h-screen flex justify-center items-start p-4 pt-[calc(7vh+1rem)]'>
-			<div className='flex flex-col gap-6 w-full max-w-4xl'>
-				{isBankNotFound ? (
+		<div className='w-full h-full flex justify-center items-center p-4'>
+			{isBankNotFound ? (
+				<div className='w-full flex justify-center items-center'>
 					<CreateBankForm />
-				) : bank ? (
-					<>
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-							<BankInfo bank={bank} />
-							<UpdateBankForm bank={bank} />
-						</div>
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-							<CreateDepositForm />
-							<CreateWithdrawForm />
-						</div>
-						<TransactionsStatistics />
-						<TransactionsList />
-					</>
-				) : null}
-			</div>
+				</div>
+			) : bank ? (
+				<div className='flex flex-col gap-6 w-full max-w-4xl'>
+					<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+						<BankInfo bank={bank} />
+						<UpdateBankForm bank={bank} />
+					</div>
+					<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+						<CreateDepositForm />
+						<CreateWithdrawForm />
+					</div>
+					<TransactionsStatistics />
+					<TransactionsList />
+				</div>
+			) : null}
 		</div>
 	)
 }

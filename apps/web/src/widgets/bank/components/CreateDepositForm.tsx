@@ -35,7 +35,7 @@ export function CreateDepositForm(): ReactElement {
 	const form = useForm<TransactionCreateRequest>({
 		resolver: zodResolver(TransactionCreateRequestSchema),
 		defaultValues: {
-			amount: 0,
+			amount: undefined,
 			type: 'DEPOSIT',
 			depositType: 'OTHER',
 			description: '',
@@ -106,11 +106,16 @@ export function CreateDepositForm(): ReactElement {
 										step='0.01'
 										min='0'
 										{...field}
-										onChange={e =>
+										value={field.value ?? ''}
+										onChange={e => {
+											const value = e.target.value
 											field.onChange(
-												parseFloat(e.target.value) || 0,
+												value === ''
+													? undefined
+													: parseFloat(value) ||
+															undefined,
 											)
-										}
+										}}
 										disabled={isLoadingCreate}
 										placeholder='Введите сумму'
 									/>

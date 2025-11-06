@@ -10,8 +10,15 @@ import {
 export const TransactionCreateRequestSchema = z
 	.object({
 		amount: z
-			.number()
-			.min(0, { message: 'Сумма должна быть больше или равна 0' }),
+			.number({
+				message: 'Сумма должна быть числом',
+			})
+			.refine(val => val !== undefined, {
+				message: 'Сумма обязательна',
+			})
+			.min(1, {
+				message: 'Сумма должна быть больше или равна 1',
+			}),
 		description: z
 			.string()
 			.max(1000, {
