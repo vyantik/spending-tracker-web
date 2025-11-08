@@ -3,14 +3,19 @@ import type { Prisma, User } from '@prisma/client'
 
 import { BaseRepository } from '../../common'
 
+import type { IUsersRepository } from './interfaces'
+
 @Injectable()
-export class UsersRepository extends BaseRepository<
-	User,
-	Prisma.UserCreateInput,
-	Prisma.UserUpdateInput,
-	Prisma.UserWhereInput,
-	Prisma.UserWhereUniqueInput
-> {
+export class UsersRepository
+	extends BaseRepository<
+		User,
+		Prisma.UserCreateInput,
+		Prisma.UserUpdateInput,
+		Prisma.UserWhereInput,
+		Prisma.UserWhereUniqueInput
+	>
+	implements IUsersRepository
+{
 	protected get model() {
 		return this.prismaService.user
 	}

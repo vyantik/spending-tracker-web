@@ -1,5 +1,6 @@
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	Logger,
 	NotFoundException,
@@ -8,7 +9,8 @@ import { RpcException } from '@nestjs/microservices'
 import ExcelJS from 'exceljs'
 import sharp from 'sharp'
 
-import { FilesRepository } from './files.repository'
+import type { IFilesRepository, IFilesService } from './interfaces'
+import { FILES_REPOSITORY_TOKEN } from './tokens'
 
 /**
  * Поддерживаемые форматы изображений
@@ -21,10 +23,13 @@ const SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp']
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 @Injectable()
-export class FilesService {
+export class FilesService implements IFilesService {
 	private readonly logger = new Logger(FilesService.name)
 
-	public constructor(private readonly filesRepository: FilesRepository) {}
+	public constructor(
+		@Inject(FILES_REPOSITORY_TOKEN)
+		private readonly filesRepository: IFilesRepository,
+	) {}
 
 	/**
 	 * Валидация формата изображения по магическим байтам

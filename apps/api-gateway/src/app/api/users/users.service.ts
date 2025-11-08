@@ -1,19 +1,23 @@
 import type { ProfileGetResponse } from '@hermes/contracts'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { User } from '@prisma/client'
 
-import { FilesService } from '../../infra'
+import type { IFilesService } from '../../infra/files/interfaces'
+import { FILES_SERVICE_TOKEN } from '../../infra/files/tokens'
 
-import { UsersRepository } from './users.repository'
+import type { IUsersRepository, IUsersService } from './interfaces'
+import { USERS_REPOSITORY_TOKEN } from './tokens'
 
 @Injectable()
-export class UsersService {
+export class UsersService implements IUsersService {
 	private readonly API_URL: string
 	public constructor(
-		private readonly filesService: FilesService,
+		@Inject(FILES_SERVICE_TOKEN)
+		private readonly filesService: IFilesService,
 		private readonly configService: ConfigService,
-		private readonly usersRepository: UsersRepository,
+		@Inject(USERS_REPOSITORY_TOKEN)
+		private readonly usersRepository: IUsersRepository,
 	) {
 		this.API_URL = this.configService.getOrThrow<string>('HTTP_HOST')
 	}

@@ -4,14 +4,19 @@ import type { DefaultArgs } from '@prisma/client/runtime/library'
 
 import { BaseRepository } from '../../common'
 
+import type { IBankRepository } from './interfaces'
+
 @Injectable()
-export class BankRepository extends BaseRepository<
-	Bank,
-	Prisma.BankCreateInput,
-	Prisma.BankUpdateInput,
-	Prisma.BankWhereInput,
-	Prisma.BankWhereUniqueInput
-> {
+export class BankRepository
+	extends BaseRepository<
+		Bank,
+		Prisma.BankCreateInput,
+		Prisma.BankUpdateInput,
+		Prisma.BankWhereInput,
+		Prisma.BankWhereUniqueInput
+	>
+	implements IBankRepository
+{
 	protected get model(): Prisma.BankDelegate<DefaultArgs> {
 		return this.prismaService.bank
 	}

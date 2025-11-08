@@ -5,10 +5,12 @@ import { PassportModule } from '@nestjs/passport'
 
 import { JwtStrategy } from '../../common'
 import { getJwtConfig } from '../../config'
+import { USERS_REPOSITORY_TOKEN } from '../users/tokens'
 import { UsersRepository } from '../users/users.repository'
 
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { AUTH_SERVICE_TOKEN } from './tokens'
 
 @Module({
 	imports: [
@@ -19,6 +21,18 @@ import { AuthService } from './auth.service'
 		}),
 	],
 	controllers: [AuthController],
-	providers: [AuthService, UsersRepository, JwtStrategy],
+	providers: [
+		{
+			provide: AUTH_SERVICE_TOKEN,
+			useClass: AuthService,
+		},
+		AuthService,
+		{
+			provide: USERS_REPOSITORY_TOKEN,
+			useClass: UsersRepository,
+		},
+		UsersRepository,
+		JwtStrategy,
+	],
 })
 export class AuthModule {}

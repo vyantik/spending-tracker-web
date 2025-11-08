@@ -8,14 +8,19 @@ import type { DefaultArgs } from '@prisma/client/runtime/library'
 
 import { BaseRepository } from '../../../common'
 
+import type { IInvitationsRepository } from './interfaces'
+
 @Injectable()
-export class InvitationsRepository extends BaseRepository<
-	BankInvitation,
-	Prisma.BankInvitationCreateInput,
-	Prisma.BankInvitationUpdateInput,
-	Prisma.BankInvitationWhereInput,
-	Prisma.BankInvitationWhereUniqueInput
-> {
+export class InvitationsRepository
+	extends BaseRepository<
+		BankInvitation,
+		Prisma.BankInvitationCreateInput,
+		Prisma.BankInvitationUpdateInput,
+		Prisma.BankInvitationWhereInput,
+		Prisma.BankInvitationWhereUniqueInput
+	>
+	implements IInvitationsRepository
+{
 	protected get model(): Prisma.BankInvitationDelegate<DefaultArgs> {
 		return this.prismaService.bankInvitation
 	}

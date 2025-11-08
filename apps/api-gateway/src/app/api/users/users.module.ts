@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 
 import { FilesModule } from '../../infra'
 
+import { USERS_REPOSITORY_TOKEN, USERS_SERVICE_TOKEN } from './tokens'
 import { UsersController } from './users.controller'
 import { UsersRepository } from './users.repository'
 import { UsersService } from './users.service'
@@ -9,7 +10,18 @@ import { UsersService } from './users.service'
 @Module({
 	imports: [FilesModule],
 	controllers: [UsersController],
-	providers: [UsersService, UsersRepository],
-	exports: [UsersRepository],
+	providers: [
+		{
+			provide: USERS_REPOSITORY_TOKEN,
+			useClass: UsersRepository,
+		},
+		{
+			provide: USERS_SERVICE_TOKEN,
+			useClass: UsersService,
+		},
+		UsersRepository,
+		UsersService,
+	],
+	exports: [USERS_REPOSITORY_TOKEN, UsersRepository],
 })
 export class UsersModule {}

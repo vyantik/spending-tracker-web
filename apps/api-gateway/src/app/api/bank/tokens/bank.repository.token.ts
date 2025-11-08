@@ -1,0 +1,1 @@
+export const BANK_REPOSITORY_TOKEN = Symbol('BANK_REPOSITORY')

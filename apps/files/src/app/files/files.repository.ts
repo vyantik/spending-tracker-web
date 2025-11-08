@@ -9,8 +9,10 @@ import {
 } from 'fs'
 import { join } from 'path'
 
+import type { IFilesRepository } from './interfaces'
+
 @Injectable()
-export class FilesRepository {
+export class FilesRepository implements IFilesRepository {
 	private readonly logger = new Logger(FilesRepository.name)
 	private readonly uploadsDir: string
 

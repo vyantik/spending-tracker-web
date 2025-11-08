@@ -9,22 +9,29 @@ import {
 import {
 	BadRequestException,
 	ForbiddenException,
+	Inject,
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common'
 import { InvitationStatus } from '@prisma/client'
 
-import { UsersRepository } from '../../users/users.repository'
-import { BankRepository } from '../bank.repository'
+import type { IUsersRepository } from '../../users/interfaces'
+import { USERS_REPOSITORY_TOKEN } from '../../users/tokens'
+import type { IBankRepository } from '../interfaces'
+import { BANK_REPOSITORY_TOKEN } from '../tokens'
 
-import { InvitationsRepository } from './invitations.repository'
+import type { IInvitationsRepository, IInvitationsService } from './interfaces'
+import { INVITATIONS_REPOSITORY_TOKEN } from './tokens'
 
 @Injectable()
-export class InvitationsService {
+export class InvitationsService implements IInvitationsService {
 	public constructor(
-		private readonly invitationsRepository: InvitationsRepository,
-		private readonly bankRepository: BankRepository,
-		private readonly usersRepository: UsersRepository,
+		@Inject(INVITATIONS_REPOSITORY_TOKEN)
+		private readonly invitationsRepository: IInvitationsRepository,
+		@Inject(BANK_REPOSITORY_TOKEN)
+		private readonly bankRepository: IBankRepository,
+		@Inject(USERS_REPOSITORY_TOKEN)
+		private readonly usersRepository: IUsersRepository,
 	) {}
 
 	public async createInvitation(

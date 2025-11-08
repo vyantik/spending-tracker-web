@@ -5,15 +5,19 @@ import type { DefaultArgs } from '@prisma/client/runtime/library'
 import { BaseRepository } from '../../../common'
 
 import type { TransactionCreateRequest, TransactionUpdateRequest } from './dto'
+import type { ITransactionsRepository } from './interfaces'
 
 @Injectable()
-export class TransactionsRepository extends BaseRepository<
-	Transaction,
-	Prisma.TransactionCreateInput,
-	Prisma.TransactionUpdateInput,
-	Prisma.TransactionWhereInput,
-	Prisma.TransactionWhereUniqueInput
-> {
+export class TransactionsRepository
+	extends BaseRepository<
+		Transaction,
+		Prisma.TransactionCreateInput,
+		Prisma.TransactionUpdateInput,
+		Prisma.TransactionWhereInput,
+		Prisma.TransactionWhereUniqueInput
+	>
+	implements ITransactionsRepository
+{
 	protected get model(): Prisma.TransactionDelegate<DefaultArgs> {
 		return this.prismaService.transaction
 	}

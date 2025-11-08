@@ -6,19 +6,26 @@ import type {
 	TransactionUpdateResponse,
 } from '@hermes/contracts'
 import type { TransactionData } from '@hermes/types/proto/files'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import type { User } from '@prisma/client'
 
-import { FilesService } from '../../../infra'
+import type { IFilesService } from '../../../infra/files/interfaces'
+import { FILES_SERVICE_TOKEN } from '../../../infra/files/tokens'
 
 import type { TransactionCreateRequest, TransactionUpdateRequest } from './dto'
-import { TransactionsRepository } from './transactions.repository'
+import type {
+	ITransactionsRepository,
+	ITransactionsService,
+} from './interfaces'
+import { TRANSACTIONS_REPOSITORY_TOKEN } from './tokens'
 
 @Injectable()
-export class TransactionsService {
+export class TransactionsService implements ITransactionsService {
 	public constructor(
-		private readonly transactionsRepository: TransactionsRepository,
-		private readonly filesService: FilesService,
+		@Inject(TRANSACTIONS_REPOSITORY_TOKEN)
+		private readonly transactionsRepository: ITransactionsRepository,
+		@Inject(FILES_SERVICE_TOKEN)
+		private readonly filesService: IFilesService,
 	) {}
 
 	public async getTransactions(

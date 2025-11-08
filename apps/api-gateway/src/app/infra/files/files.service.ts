@@ -22,8 +22,10 @@ import { RpcException } from '@nestjs/microservices'
 import { ClientGrpc } from '@nestjs/microservices'
 import { catchError, firstValueFrom, throwError } from 'rxjs'
 
+import type { IFilesService } from './interfaces'
+
 @Injectable()
-export class FilesService implements OnModuleInit {
+export class FilesService implements OnModuleInit, IFilesService {
 	private readonly logger = new Logger(FilesService.name)
 	private filesService: FilesServiceClient
 

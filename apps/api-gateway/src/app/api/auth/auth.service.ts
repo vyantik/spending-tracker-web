@@ -1,5 +1,6 @@
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	UnauthorizedException,
 } from '@nestjs/common'
@@ -10,7 +11,8 @@ import { hash, verify } from 'argon2'
 import type { Request, Response } from 'express'
 
 import { IS_DEV_ENV, ms, type StringValue } from '../../common'
-import { UsersRepository } from '../users/users.repository'
+import type { IUsersRepository } from '../users/interfaces'
+import { USERS_REPOSITORY_TOKEN } from '../users/tokens'
 
 import {
 	LoginRequest,
@@ -18,16 +20,18 @@ import {
 	RegisterRequest,
 	type RegisterResponse,
 } from './dto'
+import type { IAuthService } from './interfaces'
 import type { JwtPayload } from './interfaces'
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
 	private readonly ACCESS_TOKEN_TTL: StringValue
 	private readonly REFRESH_TOKEN_TTL: StringValue
 	private readonly COOKIES_DOMAIN: string
 
 	public constructor(
-		private readonly usersRepo: UsersRepository,
+		@Inject(USERS_REPOSITORY_TOKEN)
+		private readonly usersRepo: IUsersRepository,
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
 	) {

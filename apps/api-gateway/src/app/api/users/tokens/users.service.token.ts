@@ -1,0 +1,1 @@
+export const USERS_SERVICE_TOKEN = Symbol('USERS_SERVICE')

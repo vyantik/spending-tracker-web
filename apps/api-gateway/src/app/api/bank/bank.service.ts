@@ -4,14 +4,18 @@ import type {
 	BankGetResponse,
 	BankUpdateResponse,
 } from '@hermes/contracts'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 
-import { BankRepository } from './bank.repository'
 import type { BankCreateRequest, BankUpdateRequest } from './dto'
+import type { IBankRepository, IBankService } from './interfaces'
+import { BANK_REPOSITORY_TOKEN } from './tokens'
 
 @Injectable()
-export class BankService {
-	public constructor(private readonly bankRepository: BankRepository) {}
+export class BankService implements IBankService {
+	public constructor(
+		@Inject(BANK_REPOSITORY_TOKEN)
+		private readonly bankRepository: IBankRepository,
+	) {}
 
 	public async get(userId: string): Promise<BankGetResponse> {
 		const bank = await this.bankRepository.findByUserId(userId)
