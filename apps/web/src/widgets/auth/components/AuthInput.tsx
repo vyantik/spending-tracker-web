@@ -1,6 +1,6 @@
 'use client'
 
-import { InputHTMLAttributes, ReactElement, useState } from 'react'
+import { type InputHTMLAttributes, type ReactElement, useState } from 'react'
 
 import { Input } from '@/shared'
 

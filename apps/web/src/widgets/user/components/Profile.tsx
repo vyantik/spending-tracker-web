@@ -24,7 +24,7 @@ export function Profile(): ReactElement {
 	const { logout } = useLogoutMutation()
 
 	return (
-		<div className='flex justify-center items-center w-full min-h-screen p-4'>
+		<div className='flex justify-center items-center w-full h-full p-4'>
 			<Card className='w-full max-w-sm'>
 				<CardHeader>
 					<CardTitle>Профиль</CardTitle>

@@ -2,7 +2,7 @@
 
 import { Menu, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { ReactElement, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import {
 	Button,
