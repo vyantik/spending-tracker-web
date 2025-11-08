@@ -1,5 +1,6 @@
 'use client'
 
+import { AmountInput, DescriptionInput, FormSelect } from '.'
 import type { Transaction, TransactionUpdateRequest } from '@hermes/contracts'
 import { TransactionUpdateRequestSchema } from '@hermes/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,36 +18,15 @@ import {
 	CardTitle,
 	Form,
 	FormField,
-	Input,
-	Label,
 	toastMessageHandler,
 } from '@/shared'
 
+import {
+	categoryLabels,
+	depositTypeLabels,
+	typeLabels,
+} from '../constants/labels'
 import { transactionsService } from '../services'
-
-const categoryLabels: Record<string, string> = {
-	FOOD: 'Еда',
-	CLOTHES: 'Одежда',
-	MARKETPLACES: 'Маркетплейсы',
-	CHEMICALS: 'Химия',
-	DRUGS: 'Лекарства',
-	TECHNIQUE: 'Техника',
-	GAMES: 'Игры',
-	OTHER: 'Другое',
-}
-
-const depositTypeLabels: Record<string, string> = {
-	SALARY: 'Зарплата',
-	GIFT: 'Подарок',
-	TRANSFER: 'Перевод',
-	REFUND: 'Возврат',
-	OTHER: 'Другое',
-}
-
-const typeLabels: Record<string, string> = {
-	DEPOSIT: 'Пополнение',
-	WITHDRAW: 'Снятие',
-}
 
 interface UpdateTransactionFormProps {
 	transaction: Transaction
@@ -126,63 +106,38 @@ export function UpdateTransactionForm({
 							control={form.control}
 							name='type'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='type'>Тип</Label>
-									<select
-										id='type'
-										{...field}
-										onChange={e => {
-											field.onChange(e)
-											if (e.target.value === 'DEPOSIT') {
-												form.setValue(
-													'category',
-													undefined,
-												)
-												if (
-													!form.getValues(
-														'depositType',
-													)
-												) {
-													form.setValue(
-														'depositType',
-														'OTHER',
-													)
-												}
-											} else {
+								<FormSelect
+									field={field}
+									label='Тип'
+									options={typeLabels}
+									disabled={isLoadingUpdate}
+									error={form.formState.errors.type?.message}
+									onChange={e => {
+										field.onChange(e)
+										if (e.target.value === 'DEPOSIT') {
+											form.setValue('category', undefined)
+											if (
+												!form.getValues('depositType')
+											) {
 												form.setValue(
 													'depositType',
-													undefined,
+													'OTHER',
 												)
-												if (
-													!form.getValues('category')
-												) {
-													form.setValue(
-														'category',
-														'OTHER',
-													)
-												}
 											}
-										}}
-										disabled={isLoadingUpdate}
-										className='h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[0.1875rem] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
-									>
-										{Object.entries(typeLabels).map(
-											([value, label]) => (
-												<option
-													key={value}
-													value={value}
-												>
-													{label}
-												</option>
-											),
-										)}
-									</select>
-									{form.formState.errors.type && (
-										<p className='text-sm text-destructive'>
-											{form.formState.errors.type.message}
-										</p>
-									)}
-								</div>
+										} else {
+											form.setValue(
+												'depositType',
+												undefined,
+											)
+											if (!form.getValues('category')) {
+												form.setValue(
+													'category',
+													'OTHER',
+												)
+											}
+										}
+									}}
+								/>
 							)}
 						/>
 						{transactionType === 'WITHDRAW' && (
@@ -190,36 +145,16 @@ export function UpdateTransactionForm({
 								control={form.control}
 								name='category'
 								render={({ field }) => (
-									<div className='space-y-2'>
-										<Label htmlFor='category'>
-											Категория
-										</Label>
-										<select
-											id='category'
-											{...field}
-											disabled={isLoadingUpdate}
-											className='h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[0.1875rem] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
-										>
-											{Object.entries(categoryLabels).map(
-												([value, label]) => (
-													<option
-														key={value}
-														value={value}
-													>
-														{label}
-													</option>
-												),
-											)}
-										</select>
-										{form.formState.errors.category && (
-											<p className='text-sm text-destructive'>
-												{
-													form.formState.errors
-														.category.message
-												}
-											</p>
-										)}
-									</div>
+									<FormSelect
+										field={field}
+										label='Категория'
+										options={categoryLabels}
+										disabled={isLoadingUpdate}
+										error={
+											form.formState.errors.category
+												?.message
+										}
+									/>
 								)}
 							/>
 						)}
@@ -228,36 +163,16 @@ export function UpdateTransactionForm({
 								control={form.control}
 								name='depositType'
 								render={({ field }) => (
-									<div className='space-y-2'>
-										<Label htmlFor='depositType'>
-											Тип пополнения
-										</Label>
-										<select
-											id='depositType'
-											{...field}
-											disabled={isLoadingUpdate}
-											className='h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[0.1875rem] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
-										>
-											{Object.entries(
-												depositTypeLabels,
-											).map(([value, label]) => (
-												<option
-													key={value}
-													value={value}
-												>
-													{label}
-												</option>
-											))}
-										</select>
-										{form.formState.errors.depositType && (
-											<p className='text-sm text-destructive'>
-												{
-													form.formState.errors
-														.depositType.message
-												}
-											</p>
-										)}
-									</div>
+									<FormSelect
+										field={field}
+										label='Тип пополнения'
+										options={depositTypeLabels}
+										disabled={isLoadingUpdate}
+										error={
+											form.formState.errors.depositType
+												?.message
+										}
+									/>
 								)}
 							/>
 						)}
@@ -265,58 +180,27 @@ export function UpdateTransactionForm({
 							control={form.control}
 							name='amount'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='amount'>Сумма</Label>
-									<Input
-										id='amount'
-										type='number'
-										step='0.01'
-										min='0'
-										{...field}
-										onChange={e =>
-											field.onChange(
-												parseFloat(e.target.value) || 0,
-											)
-										}
-										value={field.value || ''}
-										disabled={isLoadingUpdate}
-										placeholder='Введите сумму'
-									/>
-									{form.formState.errors.amount && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors.amount
-													.message
-											}
-										</p>
-									)}
-								</div>
+								<AmountInput
+									field={field}
+									disabled={isLoadingUpdate}
+									error={
+										form.formState.errors.amount?.message
+									}
+								/>
 							)}
 						/>
 						<FormField
 							control={form.control}
 							name='description'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='description'>
-										Описание
-									</Label>
-									<Input
-										id='description'
-										{...field}
-										value={field.value || ''}
-										disabled={isLoadingUpdate}
-										placeholder='Введите описание (необязательно)'
-									/>
-									{form.formState.errors.description && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors
-													.description.message
-											}
-										</p>
-									)}
-								</div>
+								<DescriptionInput
+									field={field}
+									disabled={isLoadingUpdate}
+									error={
+										form.formState.errors.description
+											?.message
+									}
+								/>
 							)}
 						/>
 						<div className='flex gap-2'>

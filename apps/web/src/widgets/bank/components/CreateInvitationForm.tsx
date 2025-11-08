@@ -1,5 +1,6 @@
 'use client'
 
+import { FormInput } from '.'
 import type { BankInvitationCreateRequest } from '@hermes/contracts'
 import { BankInvitationCreateRequestSchema } from '@hermes/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,8 +15,6 @@ import {
 	CardTitle,
 	Form,
 	FormField,
-	Input,
-	Label,
 } from '@/shared'
 
 import { useCreateInvitationMutation } from '../hooks'
@@ -53,25 +52,16 @@ export function CreateInvitationForm(): ReactElement {
 							control={form.control}
 							name='inviteeUsername'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='inviteeUsername'>
-										Имя пользователя
-									</Label>
-									<Input
-										id='inviteeUsername'
-										{...field}
-										disabled={isLoadingCreate}
-										placeholder='Введите имя пользователя'
-									/>
-									{form.formState.errors.inviteeUsername && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors
-													.inviteeUsername.message
-											}
-										</p>
-									)}
-								</div>
+								<FormInput
+									field={field}
+									label='Имя пользователя'
+									disabled={isLoadingCreate}
+									placeholder='Введите имя пользователя'
+									error={
+										form.formState.errors.inviteeUsername
+											?.message
+									}
+								/>
 							)}
 						/>
 						<Button

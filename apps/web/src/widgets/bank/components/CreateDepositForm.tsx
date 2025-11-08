@@ -1,5 +1,6 @@
 'use client'
 
+import { AmountInput, DescriptionInput, FormSelect } from '.'
 import type { TransactionCreateRequest } from '@hermes/contracts'
 import { TransactionCreateRequestSchema } from '@hermes/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,19 +15,10 @@ import {
 	CardTitle,
 	Form,
 	FormField,
-	Input,
-	Label,
 } from '@/shared'
 
+import { depositTypeLabels } from '../constants/labels'
 import { useCreateTransactionMutation } from '../hooks'
-
-const depositTypeLabels: Record<string, string> = {
-	SALARY: 'Зарплата',
-	GIFT: 'Подарок',
-	TRANSFER: 'Перевод',
-	REFUND: 'Возврат',
-	OTHER: 'Другое',
-}
 
 export function CreateDepositForm(): ReactElement {
 	const { createTransaction, isLoadingCreate } =
@@ -62,97 +54,43 @@ export function CreateDepositForm(): ReactElement {
 							control={form.control}
 							name='depositType'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='depositType'>
-										Тип пополнения
-									</Label>
-									<select
-										id='depositType'
-										{...field}
-										disabled={isLoadingCreate}
-										className='h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[0.1875rem] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
-									>
-										{Object.entries(depositTypeLabels).map(
-											([value, label]) => (
-												<option
-													key={value}
-													value={value}
-												>
-													{label}
-												</option>
-											),
-										)}
-									</select>
-									{form.formState.errors.depositType && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors
-													.depositType.message
-											}
-										</p>
-									)}
-								</div>
+								<FormSelect
+									field={field}
+									label='Тип пополнения'
+									options={depositTypeLabels}
+									disabled={isLoadingCreate}
+									error={
+										form.formState.errors.depositType
+											?.message
+									}
+								/>
 							)}
 						/>
 						<FormField
 							control={form.control}
 							name='amount'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='amount'>Сумма</Label>
-									<Input
-										id='amount'
-										type='number'
-										step='0.01'
-										min='0'
-										{...field}
-										value={field.value ?? ''}
-										onChange={e => {
-											const value = e.target.value
-											field.onChange(
-												value === ''
-													? undefined
-													: parseFloat(value) ||
-															undefined,
-											)
-										}}
-										disabled={isLoadingCreate}
-										placeholder='Введите сумму'
-									/>
-									{form.formState.errors.amount && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors.amount
-													.message
-											}
-										</p>
-									)}
-								</div>
+								<AmountInput
+									field={field}
+									disabled={isLoadingCreate}
+									error={
+										form.formState.errors.amount?.message
+									}
+								/>
 							)}
 						/>
 						<FormField
 							control={form.control}
 							name='description'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='description'>
-										Описание
-									</Label>
-									<Input
-										id='description'
-										{...field}
-										disabled={isLoadingCreate}
-										placeholder='Введите описание (необязательно)'
-									/>
-									{form.formState.errors.description && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors
-													.description.message
-											}
-										</p>
-									)}
-								</div>
+								<DescriptionInput
+									field={field}
+									disabled={isLoadingCreate}
+									error={
+										form.formState.errors.description
+											?.message
+									}
+								/>
 							)}
 						/>
 						<Button

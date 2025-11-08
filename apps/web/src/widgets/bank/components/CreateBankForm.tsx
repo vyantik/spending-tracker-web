@@ -1,5 +1,6 @@
 'use client'
 
+import { FormInput } from '.'
 import type { BankCreateRequest } from '@hermes/contracts'
 import { BankCreateRequestSchema } from '@hermes/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,8 +15,6 @@ import {
 	CardTitle,
 	Form,
 	FormField,
-	Input,
-	Label,
 } from '@/shared'
 
 import { useCreateBankMutation } from '../hooks'
@@ -50,45 +49,29 @@ export function CreateBankForm(): ReactElement {
 							control={form.control}
 							name='name'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='name'>Название</Label>
-									<Input
-										id='name'
-										{...field}
-										disabled={isLoadingCreate}
-										placeholder='Введите название банка'
-									/>
-									{form.formState.errors.name && (
-										<p className='text-sm text-destructive'>
-											{form.formState.errors.name.message}
-										</p>
-									)}
-								</div>
+								<FormInput
+									field={field}
+									label='Название'
+									disabled={isLoadingCreate}
+									placeholder='Введите название банка'
+									error={form.formState.errors.name?.message}
+								/>
 							)}
 						/>
 						<FormField
 							control={form.control}
 							name='description'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='description'>
-										Описание
-									</Label>
-									<Input
-										id='description'
-										{...field}
-										disabled={isLoadingCreate}
-										placeholder='Введите описание банка (необязательно)'
-									/>
-									{form.formState.errors.description && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors
-													.description.message
-											}
-										</p>
-									)}
-								</div>
+								<FormInput
+									field={field}
+									label='Описание'
+									disabled={isLoadingCreate}
+									placeholder='Введите описание банка (необязательно)'
+									error={
+										form.formState.errors.description
+											?.message
+									}
+								/>
 							)}
 						/>
 						<Button

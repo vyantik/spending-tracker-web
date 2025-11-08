@@ -1,5 +1,6 @@
 'use client'
 
+import { FormInput } from '.'
 import type { BankGetResponse, BankUpdateRequest } from '@hermes/contracts'
 import { BankUpdateRequestSchema } from '@hermes/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -15,8 +16,6 @@ import {
 	CardTitle,
 	Form,
 	FormField,
-	Input,
-	Label,
 } from '@/shared'
 
 import { useUpdateBankMutation } from '../hooks'
@@ -56,45 +55,29 @@ export function UpdateBankForm({ bank }: UpdateBankFormProps): ReactElement {
 							control={form.control}
 							name='name'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='name'>Название</Label>
-									<Input
-										id='name'
-										{...field}
-										disabled={isLoadingUpdate}
-										placeholder='Введите название банка'
-									/>
-									{form.formState.errors.name && (
-										<p className='text-sm text-destructive'>
-											{form.formState.errors.name.message}
-										</p>
-									)}
-								</div>
+								<FormInput
+									field={field}
+									label='Название'
+									disabled={isLoadingUpdate}
+									placeholder='Введите название банка'
+									error={form.formState.errors.name?.message}
+								/>
 							)}
 						/>
 						<FormField
 							control={form.control}
 							name='description'
 							render={({ field }) => (
-								<div className='space-y-2'>
-									<Label htmlFor='description'>
-										Описание
-									</Label>
-									<Input
-										id='description'
-										{...field}
-										disabled={isLoadingUpdate}
-										placeholder='Введите описание банка (необязательно)'
-									/>
-									{form.formState.errors.description && (
-										<p className='text-sm text-destructive'>
-											{
-												form.formState.errors
-													.description.message
-											}
-										</p>
-									)}
-								</div>
+								<FormInput
+									field={field}
+									label='Описание'
+									disabled={isLoadingUpdate}
+									placeholder='Введите описание банка (необязательно)'
+									error={
+										form.formState.errors.description
+											?.message
+									}
+								/>
 							)}
 						/>
 						<Button
