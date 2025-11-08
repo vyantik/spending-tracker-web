@@ -30,7 +30,7 @@ export function UserButton({ router }: UserButtonProps): ReactElement | null {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Avatar key={user.avatar}>
+				<Avatar key={user.avatar} className='size-12'>
 					<AvatarImage
 						src={user.avatar || undefined}
 						alt={user.username}
@@ -61,5 +61,5 @@ export function UserButton({ router }: UserButtonProps): ReactElement | null {
 }
 
 export function UserButtonLoading() {
-	return <Skeleton className='h-10 w-10 rounded-full' />
+	return <Skeleton className='h-12 w-12 rounded-full' />
 }
