@@ -4,6 +4,9 @@ import type { ReactElement } from 'react'
 import { useState } from 'react'
 
 import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
 	Button,
 	Card,
 	CardContent,
@@ -126,6 +129,41 @@ export function TransactionsList(): ReactElement {
 																		transaction.category}
 																</span>
 															)}
+													{transaction.user && (
+														<div className='flex items-center gap-2'>
+															<Avatar className='size-5'>
+																<AvatarImage
+																	src={
+																		transaction
+																			.user
+																			.avatar ||
+																		undefined
+																	}
+																	alt={
+																		transaction
+																			.user
+																			.username
+																	}
+																/>
+																<AvatarFallback className='text-xs'>
+																	{transaction.user.username
+																		.slice(
+																			0,
+																			1,
+																		)
+																		.toUpperCase()}
+																</AvatarFallback>
+															</Avatar>
+															<span className='text-xs text-muted-foreground'>
+																Создал:{' '}
+																{
+																	transaction
+																		.user
+																		.username
+																}
+															</span>
+														</div>
+													)}
 												</div>
 												{transaction.description && (
 													<p className='text-sm text-muted-foreground'>

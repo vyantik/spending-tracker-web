@@ -1,13 +1,14 @@
 import type { Transaction } from '@prisma/client'
 
 import type { TransactionCreateRequest, TransactionUpdateRequest } from '../dto'
+import type { TransactionWithUser } from '../transactions.repository'
 
 export interface ITransactionsRepository {
 	getBankTransactions(
 		bankId: string,
 		page?: number,
 		limit?: number,
-	): Promise<{ transactions: Transaction[]; total: number }>
+	): Promise<{ transactions: TransactionWithUser[]; total: number }>
 	addTransaction(
 		bankId: string,
 		userId: string,

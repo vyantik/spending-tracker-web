@@ -7,6 +7,7 @@ import type {
 } from '@hermes/contracts'
 import type { TransactionData } from '@hermes/types/proto/files'
 import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import type { User } from '@prisma/client'
 
 import type { IFilesService } from '../../../infra/files/interfaces'
@@ -21,12 +22,17 @@ import { TRANSACTIONS_REPOSITORY_TOKEN } from './tokens'
 
 @Injectable()
 export class TransactionsService implements ITransactionsService {
+	private readonly API_URL: string
+
 	public constructor(
 		@Inject(TRANSACTIONS_REPOSITORY_TOKEN)
 		private readonly transactionsRepository: ITransactionsRepository,
 		@Inject(FILES_SERVICE_TOKEN)
 		private readonly filesService: IFilesService,
-	) {}
+		private readonly configService: ConfigService,
+	) {
+		this.API_URL = this.configService.getOrThrow<string>('HTTP_HOST')
+	}
 
 	public async getTransactions(
 		bankId: string | null,
@@ -51,6 +57,16 @@ export class TransactionsService implements ITransactionsService {
 				type: transaction.type,
 				category: transaction.category,
 				depositType: transaction.depositType,
+				user: transaction.user
+					? {
+							id: transaction.user.id,
+							username: transaction.user.username,
+							email: transaction.user.email,
+							avatar: transaction.user.avatar
+								? `${this.API_URL}/api/v1/files/avatar/${transaction.user.avatar}`
+								: null,
+						}
+					: null,
 			})),
 			total,
 			page,

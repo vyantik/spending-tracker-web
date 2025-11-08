@@ -7,6 +7,19 @@ import { BaseRepository } from '../../../common'
 import type { TransactionCreateRequest, TransactionUpdateRequest } from './dto'
 import type { ITransactionsRepository } from './interfaces'
 
+export type TransactionWithUser = Prisma.TransactionGetPayload<{
+	include: {
+		user: {
+			select: {
+				id: true
+				username: true
+				email: true
+				avatar: true
+			}
+		}
+	}
+}>
+
 @Injectable()
 export class TransactionsRepository
 	extends BaseRepository<
@@ -26,7 +39,7 @@ export class TransactionsRepository
 		bankId: string,
 		page: number = 1,
 		limit: number = 10,
-	): Promise<{ transactions: Transaction[]; total: number }> {
+	): Promise<{ transactions: TransactionWithUser[]; total: number }> {
 		const skip = (page - 1) * limit
 		const [transactions, total] = await Promise.all([
 			this.model.findMany({
@@ -34,6 +47,16 @@ export class TransactionsRepository
 				skip,
 				take: limit,
 				orderBy: { createdAt: 'desc' },
+				include: {
+					user: {
+						select: {
+							id: true,
+							username: true,
+							email: true,
+							avatar: true,
+						},
+					},
+				},
 			}),
 			this.model.count({ where: { bankId } }),
 		])

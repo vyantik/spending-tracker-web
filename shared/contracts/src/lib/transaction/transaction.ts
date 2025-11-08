@@ -9,6 +9,13 @@ export const TransactionType = z.enum(PrismaTransactionType)
 export const TransactionCategory = z.enum(PrismaTransactionCategory)
 export const DepositType = z.enum(PrismaDepositType)
 
+export const TransactionUserSchema = z.object({
+	id: z.string(),
+	username: z.string(),
+	email: z.string(),
+	avatar: z.string().nullable(),
+})
+
 export const TransactionSchema = z.object({
 	id: z.uuid(),
 	amount: z
@@ -23,6 +30,7 @@ export const TransactionSchema = z.object({
 	type: TransactionType,
 	category: TransactionCategory.nullable(),
 	depositType: DepositType.nullable(),
+	user: TransactionUserSchema.nullable(),
 })
 
 export type Transaction = z.infer<typeof TransactionSchema>
