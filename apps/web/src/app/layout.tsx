@@ -1,4 +1,4 @@
-import { MainProvider, ToggleTheme } from '@/shared'
+import { MainProvider } from '@/shared'
 import '@/shared/global.css'
 
 export const metadata = {
@@ -14,10 +14,7 @@ export default function RootLayout({
 	return (
 		<html lang='en' suppressHydrationWarning>
 			<body suppressHydrationWarning>
-				<MainProvider>
-					<ToggleTheme />
-					{children}
-				</MainProvider>
+				<MainProvider>{children}</MainProvider>
 			</body>
 		</html>
 	)
