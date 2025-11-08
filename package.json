@@ -51,6 +51,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cookie-parser": "^1.4.7",
+		"deep-email-validator": "^0.1.21",
 		"exceljs": "^4.4.0",
 		"ioredis": "^5.8.1",
 		"lucide-react": "^0.548.0",

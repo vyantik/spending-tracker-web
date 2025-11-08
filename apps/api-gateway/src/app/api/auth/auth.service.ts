@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import type { User } from '@prisma/client'
 import { hash, verify } from 'argon2'
+import validate from 'deep-email-validator'
 import type { Request, Response } from 'express'
 
 import { IS_DEV_ENV, ms, type StringValue } from '../../common'
@@ -56,6 +57,12 @@ export class AuthService implements IAuthService {
 		email,
 		password,
 	}: RegisterRequest): Promise<RegisterResponse> {
+		const validateEmail = await validate(email)
+
+		if (!validateEmail.valid) {
+			throw new BadRequestException('Неверный формат email адреса')
+		}
+
 		const isUserExist = await this.usersRepo.exists({
 			OR: [{ email }, { username }],
 		})
