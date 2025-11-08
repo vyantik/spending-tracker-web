@@ -3,10 +3,11 @@
 import type { ProfileGetResponse } from '@hermes/contracts'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { isAuthenticated } from '@/shared/utils'
+import { hasAccessToken, hasRefreshToken } from '@/shared/utils'
 import { userService } from '@/widgets'
+import { authService } from '@/widgets/auth/services'
 
 interface IUseProfile {
 	user: ProfileGetResponse | undefined
@@ -15,7 +16,65 @@ interface IUseProfile {
 export function useProfile(): IUseProfile {
 	const router = useRouter()
 	const queryClient = useQueryClient()
-	const hasAuth = isAuthenticated()
+	const [isRefreshing, setIsRefreshing] = useState(false)
+	const [isMounted, setIsMounted] = useState(false)
+	const refreshAttempted = useRef(false)
+
+	useEffect(() => {
+		setIsMounted(true)
+	}, [])
+
+	const hasAccess = isMounted ? hasAccessToken() : false
+	const hasRefresh = isMounted ? hasRefreshToken() : false
+	const hasAuth = hasAccess || hasRefresh
+
+	useEffect(() => {
+		if (
+			!hasAccess &&
+			hasRefresh &&
+			!isRefreshing &&
+			!refreshAttempted.current
+		) {
+			refreshAttempted.current = true
+			setIsRefreshing(true)
+			authService
+				.refresh()
+				.then(data => {
+					if (typeof window !== 'undefined') {
+						localStorage.setItem('access_token', data.access_token)
+					}
+					queryClient.invalidateQueries({ queryKey: ['profile'] })
+					refreshAttempted.current = false
+				})
+				.catch(() => {
+					if (typeof window !== 'undefined') {
+						localStorage.removeItem('access_token')
+						authService.logout().catch(() => {})
+						const pathname = window.location.pathname
+						const publicPaths = ['/', '/auth']
+						const isPublicPath = publicPaths.some(
+							path =>
+								pathname === path ||
+								pathname.startsWith(`${path}/`),
+						)
+						if (!isPublicPath) {
+							router.replace('/auth/login')
+						}
+					}
+					queryClient.setQueryData<ProfileGetResponse | undefined>(
+						['profile'],
+						undefined,
+					)
+					refreshAttempted.current = false
+				})
+				.finally(() => {
+					setIsRefreshing(false)
+				})
+		}
+		if (hasAccess) {
+			refreshAttempted.current = false
+		}
+	}, [hasAccess, hasRefresh, isRefreshing, queryClient, router])
 
 	const {
 		data: user,
@@ -24,7 +83,7 @@ export function useProfile(): IUseProfile {
 	} = useQuery({
 		queryKey: ['profile'],
 		queryFn: () => userService.getProfile(),
-		enabled: hasAuth,
+		enabled: hasAccess && !isRefreshing,
 		retry: false,
 		staleTime: 5 * 60 * 1000, // 5 минут
 		gcTime: 10 * 60 * 1000, // 10 минут
@@ -41,9 +100,16 @@ export function useProfile(): IUseProfile {
 				)
 				if (typeof window !== 'undefined') {
 					localStorage.removeItem('access_token')
+					authService.logout().catch(() => {})
 					const pathname = window.location.pathname
-					if (!pathname.startsWith('/auth') && pathname !== '/') {
-						router.push('/auth/login')
+					const publicPaths = ['/', '/auth']
+					const isPublicPath = publicPaths.some(
+						path =>
+							pathname === path ||
+							pathname.startsWith(`${path}/`),
+					)
+					if (!isPublicPath) {
+						router.replace('/auth/login')
 					}
 				}
 			}
@@ -52,6 +118,6 @@ export function useProfile(): IUseProfile {
 
 	return {
 		user,
-		isLoadingUser: hasAuth ? isLoadingUser : false,
+		isLoadingUser: hasAuth ? isLoadingUser || isRefreshing : false,
 	}
 }

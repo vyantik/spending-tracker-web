@@ -19,6 +19,10 @@ class AuthService {
 	public async logout(): Promise<undefined> {
 		return await api.post<undefined>('/auth/logout')
 	}
+
+	public async refresh(): Promise<LoginResponse> {
+		return await api.post<LoginResponse>('/auth/refresh')
+	}
 }
 
 export const authService = new AuthService()
