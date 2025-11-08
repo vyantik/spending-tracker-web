@@ -16,8 +16,8 @@ export const AuthWrapper = ({ type }: AuthWrapperProps): ReactElement => {
 	const router = useRouter()
 
 	return (
-		<div className='w-screen h-screen flex justify-center items-center'>
-			<Card className='w-1/4'>
+		<div className='w-full min-h-screen flex justify-center items-center p-4'>
+			<Card className='w-full max-w-md'>
 				{type === 'login' ? (
 					<Login router={router} />
 				) : (

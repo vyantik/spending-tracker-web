@@ -91,9 +91,9 @@ export function TransactionsList(): ReactElement {
 											onSuccess={() => setEditingId(null)}
 										/>
 									) : (
-										<div className='flex items-center justify-between p-3 rounded-lg border bg-card'>
+										<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 rounded-lg border bg-card'>
 											<div className='flex-1 space-y-1'>
-												<div className='flex items-center gap-2'>
+												<div className='flex flex-wrap items-center gap-2'>
 													<span
 														className={`text-sm font-medium ${
 															transaction.type ===
@@ -135,8 +135,8 @@ export function TransactionsList(): ReactElement {
 													</p>
 												)}
 											</div>
-											<div className='flex items-center gap-2'>
-												<div className='text-right'>
+											<div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-2'>
+												<div className='text-left sm:text-right'>
 													<p
 														className={`font-semibold ${
 															transaction.type ===
@@ -159,30 +159,38 @@ export function TransactionsList(): ReactElement {
 														)}
 													</p>
 												</div>
-												<Button
-													variant='outline'
-													size='sm'
-													onClick={() =>
-														setEditingId(
-															transaction.id,
-														)
-													}
-													disabled={isLoadingDelete}
-												>
-													Редактировать
-												</Button>
-												<Button
-													variant='destructive'
-													size='sm'
-													onClick={() =>
-														deleteTransaction(
-															transaction.id,
-														)
-													}
-													disabled={isLoadingDelete}
-												>
-													Удалить
-												</Button>
+												<div className='flex gap-2'>
+													<Button
+														variant='outline'
+														size='sm'
+														onClick={() =>
+															setEditingId(
+																transaction.id,
+															)
+														}
+														disabled={
+															isLoadingDelete
+														}
+														className='flex-1 sm:flex-initial'
+													>
+														Редактировать
+													</Button>
+													<Button
+														variant='destructive'
+														size='sm'
+														onClick={() =>
+															deleteTransaction(
+																transaction.id,
+															)
+														}
+														disabled={
+															isLoadingDelete
+														}
+														className='flex-1 sm:flex-initial'
+													>
+														Удалить
+													</Button>
+												</div>
 											</div>
 										</div>
 									)}
@@ -191,7 +199,7 @@ export function TransactionsList(): ReactElement {
 						</div>
 
 						{totalPages > 1 && (
-							<div className='flex items-center justify-between pt-4 border-t'>
+							<div className='flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 pt-4 border-t'>
 								<Button
 									variant='outline'
 									size='sm'
@@ -199,6 +207,7 @@ export function TransactionsList(): ReactElement {
 										setPage(p => Math.max(1, p - 1))
 									}
 									disabled={currentPage === 1}
+									className='w-full sm:w-auto'
 								>
 									Назад
 								</Button>
@@ -214,6 +223,7 @@ export function TransactionsList(): ReactElement {
 										)
 									}
 									disabled={currentPage === totalPages}
+									className='w-full sm:w-auto'
 								>
 									Вперед
 								</Button>

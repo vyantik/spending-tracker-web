@@ -122,26 +122,32 @@ export function TransactionsStatistics(): ReactElement {
 	return (
 		<Card>
 			<CardHeader>
-				<div className='flex items-center justify-between'>
+				<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0'>
 					<CardTitle>Статистика транзакций</CardTitle>
 					<Button
 						variant='outline'
 						size='sm'
 						onClick={handleDownloadExcel}
 						disabled={isDownloading}
+						className='w-full sm:w-auto'
 					>
 						<Download className='h-4 w-4' />
-						{isDownloading ? 'Загрузка...' : 'Скачать Excel'}
+						<span className='hidden sm:inline'>
+							{isDownloading ? 'Загрузка...' : 'Скачать Excel'}
+						</span>
+						<span className='sm:hidden'>
+							{isDownloading ? 'Загрузка...' : 'Excel'}
+						</span>
 					</Button>
 				</div>
 			</CardHeader>
 			<CardContent className='space-y-6'>
-				<div className='grid grid-cols-3 gap-4'>
+				<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
 					<div className='space-y-1'>
 						<p className='text-sm text-muted-foreground'>
 							Пополнения
 						</p>
-						<p className='text-2xl font-semibold text-green-600'>
+						<p className='text-xl sm:text-2xl font-semibold text-green-600'>
 							{stats.totalDeposit.toLocaleString('ru-RU', {
 								style: 'currency',
 								currency: 'RUB',
@@ -151,7 +157,7 @@ export function TransactionsStatistics(): ReactElement {
 					</div>
 					<div className='space-y-1'>
 						<p className='text-sm text-muted-foreground'>Снятия</p>
-						<p className='text-2xl font-semibold text-red-600'>
+						<p className='text-xl sm:text-2xl font-semibold text-red-600'>
 							{stats.totalWithdraw.toLocaleString('ru-RU', {
 								style: 'currency',
 								currency: 'RUB',
@@ -162,7 +168,7 @@ export function TransactionsStatistics(): ReactElement {
 					<div className='space-y-1'>
 						<p className='text-sm text-muted-foreground'>Баланс</p>
 						<p
-							className={`text-2xl font-semibold ${
+							className={`text-xl sm:text-2xl font-semibold ${
 								stats.balance >= 0
 									? 'text-green-600'
 									: 'text-red-600'
@@ -192,11 +198,11 @@ export function TransactionsStatistics(): ReactElement {
 									: categoryLabels[key] || key
 								return (
 									<div key={key} className='space-y-2'>
-										<div className='flex items-center justify-between'>
+										<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0'>
 											<span className='text-sm font-medium'>
 												{label}
 											</span>
-											<span className='text-sm text-muted-foreground'>
+											<span className='text-xs sm:text-sm text-muted-foreground'>
 												{amount.toLocaleString(
 													'ru-RU',
 													{

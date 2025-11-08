@@ -10,14 +10,17 @@ import { userService } from '../services'
 
 export function useLogoutMutation() {
 	const queryClient = useQueryClient()
+	const router = useRouter()
 	const { mutate: logout, isPending: isLoadingLogout } = useMutation({
 		mutationKey: ['logout user'],
 		mutationFn: () => userService.logout(),
 		onSuccess() {
 			localStorage.removeItem('access_token')
 			queryClient.resetQueries({ queryKey: ['profile'] })
+			queryClient.clear()
 			toast.success('Успешный выход из аккаунта')
-			window.location.reload()
+			router.push('/')
+			router.refresh()
 		},
 		onError(error) {
 			toastMessageHandler(error)

@@ -71,9 +71,9 @@ export function IncomingInvitationsList(): ReactElement {
 					{invitations.map(invitation => (
 						<div
 							key={invitation.id}
-							className='flex items-center justify-between p-4 border rounded-lg'
+							className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-4 border rounded-lg'
 						>
-							<div className='flex flex-col gap-1'>
+							<div className='flex flex-col gap-1 flex-1'>
 								<p className='font-medium'>
 									Банк: {invitation.bankName}
 								</p>
@@ -87,7 +87,7 @@ export function IncomingInvitationsList(): ReactElement {
 								</p>
 							</div>
 							{invitation.status === 'PENDING' && (
-								<div className='flex gap-2'>
+								<div className='flex flex-col sm:flex-row gap-2'>
 									<Button
 										variant='outline'
 										size='sm'
@@ -97,6 +97,7 @@ export function IncomingInvitationsList(): ReactElement {
 										disabled={
 											isLoadingDecline || isLoadingAccept
 										}
+										className='w-full sm:w-auto'
 									>
 										Отклонить
 									</Button>
@@ -108,6 +109,7 @@ export function IncomingInvitationsList(): ReactElement {
 										disabled={
 											isLoadingAccept || isLoadingDecline
 										}
+										className='w-full sm:w-auto'
 									>
 										Принять
 									</Button>
