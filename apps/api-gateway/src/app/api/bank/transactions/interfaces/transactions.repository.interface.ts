@@ -3,7 +3,6 @@ import type { Transaction } from '@prisma/client'
 import type { TransactionCreateRequest, TransactionUpdateRequest } from '../dto'
 import type {
 	TransactionForExcel,
-	TransactionWhereUnique,
 	TransactionWithUser,
 } from '../transactions.repository'
 
@@ -21,9 +20,9 @@ export interface ITransactionsRepository {
 	updateTransaction(
 		dto: TransactionUpdateRequest,
 		id: string,
-		userId: string,
+		bankId: string,
 	): Promise<Transaction>
 	getAllBankTransactions(bankId: string): Promise<TransactionForExcel[]>
-	findUnique(where: TransactionWhereUnique): Promise<Transaction | null>
-	delete(where: TransactionWhereUnique): Promise<Transaction>
+	findByBankId(id: string, bankId: string): Promise<Transaction | null>
+	deleteByBankId(id: string, bankId: string): Promise<Transaction>
 }

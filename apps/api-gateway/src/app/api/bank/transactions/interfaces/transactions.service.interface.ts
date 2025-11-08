@@ -21,16 +21,16 @@ export interface ITransactionsService {
 	): Promise<TransactionCreateResponse>
 	updateTransaction(
 		dto: TransactionUpdateRequest,
-		userId: string,
+		bankId: string | null,
 		transactionId: string,
 	): Promise<TransactionUpdateResponse>
 	getTransaction(
 		transactionId: string,
-		userId: string,
+		bankId: string | null,
 	): Promise<TransactionGetResponse>
 	deleteTransaction(
 		transactionId: string,
-		userId: string,
+		bankId: string | null,
 	): Promise<TransactionDeleteResponse>
 	generateTransactionsExcel(bankId: string | null): Promise<{
 		file: Uint8Array

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import type { Prisma, Transaction } from '@prisma/client'
 import type { DefaultArgs } from '@prisma/client/runtime/library'
 
@@ -33,11 +33,6 @@ export type TransactionForExcel = {
 	category: Transaction['category']
 	depositType: Transaction['depositType']
 	createdAt: Date
-}
-
-export type TransactionWhereUnique = {
-	id: string
-	userId: string
 }
 
 @Injectable()
@@ -116,9 +111,40 @@ export class TransactionsRepository
 	public async updateTransaction(
 		dto: TransactionUpdateRequest,
 		id: string,
-		userId: string,
+		bankId: string,
 	): Promise<Transaction> {
-		return await this.update({ id, userId }, dto)
+		const transaction = await this.findFirst({
+			id,
+			bankId,
+		})
+		if (!transaction) {
+			throw new BadRequestException('Транзакция не найдена')
+		}
+		return await this.update({ id }, dto)
+	}
+
+	public async findByBankId(
+		id: string,
+		bankId: string,
+	): Promise<Transaction | null> {
+		return await this.findFirst({
+			id,
+			bankId,
+		})
+	}
+
+	public async deleteByBankId(
+		id: string,
+		bankId: string,
+	): Promise<Transaction> {
+		const transaction = await this.findFirst({
+			id,
+			bankId,
+		})
+		if (!transaction) {
+			throw new BadRequestException('Транзакция не найдена')
+		}
+		return await this.delete({ id })
 	}
 
 	public async getAllBankTransactions(

@@ -89,13 +89,16 @@ export class TransactionsService implements ITransactionsService {
 
 	public async updateTransaction(
 		dto: TransactionUpdateRequest,
-		userId: string,
+		bankId: string | null,
 		transactionId: string,
 	): Promise<TransactionUpdateResponse> {
+		if (bankId === null) {
+			throw new BadRequestException('Пользователь еще не создал банк')
+		}
 		await this.transactionsRepository.updateTransaction(
 			dto,
 			transactionId,
-			userId,
+			bankId,
 		)
 		return {
 			message: 'ok',
@@ -104,12 +107,15 @@ export class TransactionsService implements ITransactionsService {
 
 	public async getTransaction(
 		transactionId: string,
-		userId: string,
+		bankId: string | null,
 	): Promise<TransactionGetResponse> {
-		const transaction = await this.transactionsRepository.findUnique({
-			id: transactionId,
-			userId: userId,
-		})
+		if (bankId === null) {
+			throw new BadRequestException('Пользователь еще не создал банк')
+		}
+		const transaction = await this.transactionsRepository.findByBankId(
+			transactionId,
+			bankId,
+		)
 		if (!transaction) {
 			throw new BadRequestException('Транзакция не найдена')
 		}
@@ -125,12 +131,12 @@ export class TransactionsService implements ITransactionsService {
 
 	public async deleteTransaction(
 		transactionId: string,
-		userId: string,
+		bankId: string | null,
 	): Promise<TransactionDeleteResponse> {
-		await this.transactionsRepository.delete({
-			id: transactionId,
-			userId: userId,
-		})
+		if (bankId === null) {
+			throw new BadRequestException('Пользователь еще не создал банк')
+		}
+		await this.transactionsRepository.deleteByBankId(transactionId, bankId)
 		return {
 			message: 'ok',
 		}

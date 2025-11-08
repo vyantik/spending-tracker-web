@@ -90,7 +90,7 @@ export class TransactionsController {
 	@Protected()
 	@Patch('/:transactionId')
 	public async updateTransaction(
-		@Authorized('id') userId: string,
+		@Authorized('bankId') bankId: string | null,
 		@Param('transactionId') transactionId: string,
 		@Body() dto: TransactionUpdateRequest,
 	): Promise<TransactionUpdateResponse> {
@@ -99,7 +99,7 @@ export class TransactionsController {
 		})
 		return this.transactionsService.updateTransaction(
 			dto,
-			userId,
+			bankId,
 			transactionId,
 		)
 	}
@@ -110,13 +110,13 @@ export class TransactionsController {
 	@Protected()
 	@Get('/:transactionId')
 	public async getTransaction(
-		@Authorized('id') userId: string,
+		@Authorized('bankId') bankId: string | null,
 		@Param('transactionId') transactionId: string,
 	): Promise<TransactionGetResponse> {
 		await z.parseAsync(TransactionGetRequestSchema, {
 			id: transactionId,
 		})
-		return this.transactionsService.getTransaction(transactionId, userId)
+		return this.transactionsService.getTransaction(transactionId, bankId)
 	}
 
 	@ApiOperation({ summary: 'Delete transaction' })
@@ -125,13 +125,13 @@ export class TransactionsController {
 	@Protected()
 	@Delete('/:transactionId')
 	public async deleteTransaction(
-		@Authorized('id') userId: string,
+		@Authorized('bankId') bankId: string | null,
 		@Param('transactionId') transactionId: string,
 	): Promise<TransactionDeleteResponse> {
 		await z.parseAsync(TransactionGetRequestSchema, {
 			id: transactionId,
 		})
-		return this.transactionsService.deleteTransaction(transactionId, userId)
+		return this.transactionsService.deleteTransaction(transactionId, bankId)
 	}
 
 	@ApiOperation({

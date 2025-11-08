@@ -12,10 +12,12 @@ import { toast } from 'sonner'
 
 import {
 	Button,
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 	Form,
 	FormField,
 	toastMessageHandler,
@@ -82,20 +84,17 @@ export function UpdateTransactionForm({
 		updateTransaction({ transactionId: transaction.id, values })
 	}
 
-	if (!isOpen) {
-		return (
-			<Button variant='outline' size='sm' onClick={() => setIsOpen(true)}>
-				Редактировать
-			</Button>
-		)
-	}
-
 	return (
-		<Card className='w-full max-w-md'>
-			<CardHeader>
-				<CardTitle>Редактировать транзакцию</CardTitle>
-			</CardHeader>
-			<CardContent>
+		<Dialog open={isOpen} onOpenChange={setIsOpen}>
+			<DialogTrigger asChild>
+				<Button variant='outline' size='sm'>
+					Редактировать
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px]'>
+				<DialogHeader>
+					<DialogTitle>Редактировать транзакцию</DialogTitle>
+				</DialogHeader>
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
@@ -202,14 +201,7 @@ export function UpdateTransactionForm({
 								/>
 							)}
 						/>
-						<div className='flex gap-2'>
-							<Button
-								type='submit'
-								disabled={isLoadingUpdate}
-								className='flex-1'
-							>
-								{isLoadingUpdate ? 'Обновление...' : 'Обновить'}
-							</Button>
+						<DialogFooter>
 							<Button
 								type='button'
 								variant='outline'
@@ -218,10 +210,13 @@ export function UpdateTransactionForm({
 							>
 								Отмена
 							</Button>
-						</div>
+							<Button type='submit' disabled={isLoadingUpdate}>
+								{isLoadingUpdate ? 'Обновление...' : 'Обновить'}
+							</Button>
+						</DialogFooter>
 					</form>
 				</Form>
-			</CardContent>
-		</Card>
+			</DialogContent>
+		</Dialog>
 	)
 }

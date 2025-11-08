@@ -45,7 +45,6 @@ const typeLabels: Record<string, string> = {
 
 export function TransactionsList(): ReactElement {
 	const [page, setPage] = useState(1)
-	const [editingId, setEditingId] = useState<string | null>(null)
 	const limit = 10
 	const {
 		transactions,
@@ -88,150 +87,122 @@ export function TransactionsList(): ReactElement {
 						<div className='space-y-2'>
 							{transactions.map(transaction => (
 								<div key={transaction.id} className='space-y-2'>
-									{editingId === transaction.id ? (
-										<UpdateTransactionForm
-											transaction={transaction}
-											onSuccess={() => setEditingId(null)}
-										/>
-									) : (
-										<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 rounded-lg border bg-card'>
-											<div className='flex-1 space-y-1'>
-												<div className='flex flex-wrap items-center gap-2'>
-													<span
-														className={`text-sm font-medium ${
-															transaction.type ===
-															'DEPOSIT'
-																? 'text-green-600'
-																: 'text-red-600'
-														}`}
-													>
-														{typeLabels[
-															transaction.type
-														] || transaction.type}
-													</span>
-													{transaction.type ===
-													'DEPOSIT'
-														? transaction.depositType && (
-																<span className='text-xs text-muted-foreground'>
-																	{depositTypeLabels[
-																		transaction
-																			.depositType
-																	] ||
-																		transaction.depositType}
-																</span>
-															)
-														: transaction.category && (
-																<span className='text-xs text-muted-foreground'>
-																	{categoryLabels[
-																		transaction
-																			.category
-																	] ||
-																		transaction.category}
-																</span>
-															)}
-													{transaction.user && (
-														<div className='flex items-center gap-2'>
-															<Avatar className='size-5'>
-																<AvatarImage
-																	src={
-																		transaction
-																			.user
-																			.avatar ||
-																		undefined
-																	}
-																	alt={
-																		transaction
-																			.user
-																			.username
-																	}
-																/>
-																<AvatarFallback className='text-xs'>
-																	{transaction.user.username
-																		.slice(
-																			0,
-																			1,
-																		)
-																		.toUpperCase()}
-																</AvatarFallback>
-															</Avatar>
+									<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 rounded-lg border bg-card'>
+										<div className='flex-1 space-y-1'>
+											<div className='flex flex-wrap items-center gap-2'>
+												<span
+													className={`text-sm font-medium ${
+														transaction.type ===
+														'DEPOSIT'
+															? 'text-green-600'
+															: 'text-red-600'
+													}`}
+												>
+													{typeLabels[
+														transaction.type
+													] || transaction.type}
+												</span>
+												{transaction.type === 'DEPOSIT'
+													? transaction.depositType && (
 															<span className='text-xs text-muted-foreground'>
-																Создал:{' '}
-																{
+																{depositTypeLabels[
+																	transaction
+																		.depositType
+																] ||
+																	transaction.depositType}
+															</span>
+														)
+													: transaction.category && (
+															<span className='text-xs text-muted-foreground'>
+																{categoryLabels[
+																	transaction
+																		.category
+																] ||
+																	transaction.category}
+															</span>
+														)}
+												{transaction.user && (
+													<div className='flex items-center gap-2'>
+														<Avatar className='size-5'>
+															<AvatarImage
+																src={
+																	transaction
+																		.user
+																		.avatar ||
+																	undefined
+																}
+																alt={
 																	transaction
 																		.user
 																		.username
 																}
-															</span>
-														</div>
-													)}
-												</div>
-												{transaction.description && (
-													<p className='text-sm text-muted-foreground'>
-														{
-															transaction.description
-														}
-													</p>
+															/>
+															<AvatarFallback className='text-xs'>
+																{transaction.user.username
+																	.slice(0, 1)
+																	.toUpperCase()}
+															</AvatarFallback>
+														</Avatar>
+														<span className='text-xs text-muted-foreground'>
+															Создал:{' '}
+															{
+																transaction.user
+																	.username
+															}
+														</span>
+													</div>
 												)}
 											</div>
-											<div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-2'>
-												<div className='text-left sm:text-right'>
-													<p
-														className={`font-semibold ${
-															transaction.type ===
-															'DEPOSIT'
-																? 'text-green-600'
-																: 'text-red-600'
-														}`}
-													>
-														{transaction.type ===
+											{transaction.description && (
+												<p className='text-sm text-muted-foreground'>
+													{transaction.description}
+												</p>
+											)}
+										</div>
+										<div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-2'>
+											<div className='text-left sm:text-right'>
+												<p
+													className={`font-semibold ${
+														transaction.type ===
 														'DEPOSIT'
-															? '+'
-															: '-'}
-														{transaction.amount.toLocaleString(
-															'ru-RU',
-															{
-																style: 'currency',
-																currency: 'RUB',
-																minimumFractionDigits: 0,
-															},
-														)}
-													</p>
-												</div>
-												<div className='flex gap-2'>
-													<Button
-														variant='outline'
-														size='sm'
-														onClick={() =>
-															setEditingId(
-																transaction.id,
-															)
-														}
-														disabled={
-															isLoadingDelete
-														}
-														className='flex-1 sm:flex-initial'
-													>
-														Редактировать
-													</Button>
-													<Button
-														variant='destructive'
-														size='sm'
-														onClick={() =>
-															deleteTransaction(
-																transaction.id,
-															)
-														}
-														disabled={
-															isLoadingDelete
-														}
-														className='flex-1 sm:flex-initial'
-													>
-														Удалить
-													</Button>
-												</div>
+															? 'text-green-600'
+															: 'text-red-600'
+													}`}
+												>
+													{transaction.type ===
+													'DEPOSIT'
+														? '+'
+														: '-'}
+													{transaction.amount.toLocaleString(
+														'ru-RU',
+														{
+															style: 'currency',
+															currency: 'RUB',
+															minimumFractionDigits: 0,
+														},
+													)}
+												</p>
+											</div>
+											<div className='flex gap-2'>
+												<UpdateTransactionForm
+													transaction={transaction}
+												/>
+												<Button
+													variant='destructive'
+													size='sm'
+													onClick={() =>
+														deleteTransaction(
+															transaction.id,
+														)
+													}
+													disabled={isLoadingDelete}
+													className='flex-1 sm:flex-initial'
+												>
+													Удалить
+												</Button>
 											</div>
 										</div>
-									)}
+									</div>
 								</div>
 							))}
 						</div>
