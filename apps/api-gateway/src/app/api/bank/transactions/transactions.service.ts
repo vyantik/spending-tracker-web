@@ -61,7 +61,6 @@ export class TransactionsService implements ITransactionsService {
 					? {
 							id: transaction.user.id,
 							username: transaction.user.username,
-							email: transaction.user.email,
 							avatar: transaction.user.avatar
 								? `${this.API_URL}/api/v1/files/avatar/${transaction.user.avatar}`
 								: null,

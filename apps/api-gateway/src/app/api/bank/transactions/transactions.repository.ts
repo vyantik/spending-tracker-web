@@ -8,17 +8,37 @@ import type { TransactionCreateRequest, TransactionUpdateRequest } from './dto'
 import type { ITransactionsRepository } from './interfaces'
 
 export type TransactionWithUser = Prisma.TransactionGetPayload<{
-	include: {
+	select: {
+		id: true
+		amount: true
+		description: true
+		type: true
+		category: true
+		depositType: true
 		user: {
 			select: {
 				id: true
 				username: true
-				email: true
 				avatar: true
 			}
 		}
 	}
 }>
+
+export type TransactionForExcel = {
+	id: string
+	amount: Prisma.Decimal
+	description: string
+	type: Transaction['type']
+	category: Transaction['category']
+	depositType: Transaction['depositType']
+	createdAt: Date
+}
+
+export type TransactionWhereUnique = {
+	id: string
+	userId: string
+}
 
 @Injectable()
 export class TransactionsRepository
@@ -47,12 +67,17 @@ export class TransactionsRepository
 				skip,
 				take: limit,
 				orderBy: { createdAt: 'desc' },
-				include: {
+				select: {
+					id: true,
+					amount: true,
+					description: true,
+					type: true,
+					category: true,
+					depositType: true,
 					user: {
 						select: {
 							id: true,
 							username: true,
-							email: true,
 							avatar: true,
 						},
 					},
@@ -98,10 +123,19 @@ export class TransactionsRepository
 
 	public async getAllBankTransactions(
 		bankId: string,
-	): Promise<Transaction[]> {
+	): Promise<TransactionForExcel[]> {
 		return await this.model.findMany({
 			where: { bankId },
 			orderBy: { createdAt: 'desc' },
+			select: {
+				id: true,
+				amount: true,
+				description: true,
+				type: true,
+				category: true,
+				depositType: true,
+				createdAt: true,
+			},
 		})
 	}
 }

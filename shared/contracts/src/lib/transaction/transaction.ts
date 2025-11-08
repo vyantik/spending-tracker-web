@@ -12,7 +12,6 @@ export const DepositType = z.enum(PrismaDepositType)
 export const TransactionUserSchema = z.object({
 	id: z.string(),
 	username: z.string(),
-	email: z.string(),
 	avatar: z.string().nullable(),
 })
 
