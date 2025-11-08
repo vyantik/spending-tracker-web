@@ -4,6 +4,7 @@ export interface IUsersRepository {
 	findById(userId: string): Promise<User | null>
 	findByEmail(email: string): Promise<User | null>
 	findByUsername(username: string): Promise<User | null>
+	findMany(where?: Prisma.UserWhereInput): Promise<User[]>
 	createUser(data: Prisma.UserCreateInput): Promise<User>
 	updateUser(userId: string, data: Prisma.UserUpdateInput): Promise<User>
 	deleteUser(userId: string): Promise<User>
