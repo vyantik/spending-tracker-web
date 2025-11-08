@@ -21,7 +21,9 @@ model User {
   bank   Bank?   @relation(fields: [bankId], references: [id])
   bankId String? @map("bank_id")
 
-  Transaction Transaction[]
+  Transaction         Transaction[]
+  sentInvitations     BankInvitation[] @relation("Inviter")
+  receivedInvitations BankInvitation[] @relation("Invitee")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -37,6 +39,7 @@ model Bank {
 
   users        User[]
   transactions Transaction[]
+  invitations  BankInvitation[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -100,4 +103,33 @@ enum UserRole {
   ADMIN
 
   @@map("user_role")
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+
+  @@map("invitation_status")
+}
+
+model BankInvitation {
+  id String @id @default(uuid())
+
+  bank   Bank   @relation(fields: [bankId], references: [id])
+  bankId String @map("bank_id")
+
+  inviter   User   @relation("Inviter", fields: [inviterId], references: [id])
+  inviterId String @map("inviter_id")
+
+  invitee   User   @relation("Invitee", fields: [inviteeId], references: [id])
+  inviteeId String @map("invitee_id")
+
+  status InvitationStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([bankId, inviteeId])
+  @@map("bank_invitations")
 }
