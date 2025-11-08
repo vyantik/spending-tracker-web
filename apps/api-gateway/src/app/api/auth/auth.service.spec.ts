@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { Test, type TestingModule } from '@nestjs/testing'
-import { hash, verify } from 'argon2'
+import { hash } from 'argon2'
 import type { Response } from 'express'
 
 import type { IUsersRepository } from '../users/interfaces'
