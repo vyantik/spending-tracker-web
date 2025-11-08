@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { Bank, Prisma } from '@prisma/client'
-import { DefaultArgs } from '@prisma/client/runtime/library'
+import type { Bank, Prisma } from '@prisma/client'
+import type { DefaultArgs } from '@prisma/client/runtime/library'
 
 import { BaseRepository } from '../../common'
 

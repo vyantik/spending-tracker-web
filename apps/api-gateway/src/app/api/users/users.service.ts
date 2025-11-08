@@ -1,7 +1,7 @@
 import type { ProfileGetResponse } from '@hermes/contracts'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { User } from '@prisma/client'
+import type { User } from '@prisma/client'
 
 import { FilesService } from '../../infra'
 

@@ -5,7 +5,7 @@ import type {
 	TransactionGetResponse,
 	TransactionUpdateResponse,
 } from '@hermes/contracts'
-import { TransactionData } from '@hermes/types/proto/files'
+import type { TransactionData } from '@hermes/types/proto/files'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import type { User } from '@prisma/client'
 

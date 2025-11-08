@@ -1,4 +1,4 @@
-import { MailerOptions } from '@nestjs-modules/mailer'
+import type { MailerOptions } from '@nestjs-modules/mailer'
 import { ConfigService } from '@nestjs/config'
 
 export function getMailerConfig(config: ConfigService): MailerOptions {

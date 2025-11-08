@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config'
-import { RedisOptions } from 'bullmq'
+import type { RedisOptions } from 'bullmq'
 
 export function getRedisConfig(configService: ConfigService): RedisOptions {
 	return {
