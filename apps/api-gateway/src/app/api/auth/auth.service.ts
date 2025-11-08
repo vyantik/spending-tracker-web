@@ -11,6 +11,7 @@ import { hash, verify } from 'argon2'
 import type { Request, Response } from 'express'
 
 import { IS_DEV_ENV, ms, type StringValue } from '../../common'
+import { MailService } from '../../libs/mail/mail.service'
 import type { IUsersRepository } from '../users/interfaces'
 import { USERS_REPOSITORY_TOKEN } from '../users/tokens'
 
@@ -19,9 +20,12 @@ import {
 	LoginResponse,
 	RegisterRequest,
 	type RegisterResponse,
+	VerifyOtpRequest,
+	type VerifyOtpResponse,
 } from './dto'
 import type { IAuthService } from './interfaces'
 import type { JwtPayload } from './interfaces'
+import { OtpService } from './services/otp.service'
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -34,6 +38,8 @@ export class AuthService implements IAuthService {
 		private readonly usersRepo: IUsersRepository,
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
+		private readonly otpService: OtpService,
+		private readonly mailService: MailService,
 	) {
 		this.ACCESS_TOKEN_TTL = this.configService.getOrThrow<StringValue>(
 			'JWT_ACCESS_TOKEN_TTL',
@@ -68,7 +74,12 @@ export class AuthService implements IAuthService {
 			password: hashedPassword,
 		})
 
-		return { message: 'Пользователь успешно зарегестрирован' }
+		await this.otpService.generateAndSendOtp(email)
+
+		return {
+			message:
+				'Пользователь успешно зарегестрирован. Проверьте почту для подтверждения.',
+		}
 	}
 
 	public async login(
@@ -83,6 +94,12 @@ export class AuthService implements IAuthService {
 
 		if (!(await verify(user.password, password))) {
 			throw new BadRequestException('Неверный email или пароль')
+		}
+
+		if (!user.isActivate) {
+			throw new BadRequestException(
+				'Пожалуйста, подтвердите ваш email адрес перед входом',
+			)
 		}
 
 		const access_token = await this.auth(res, user)
@@ -151,6 +168,24 @@ export class AuthService implements IAuthService {
 			expires,
 			secure: !IS_DEV_ENV,
 		})
+	}
+
+	public async verifyOtp({
+		email,
+		code,
+	}: VerifyOtpRequest): Promise<VerifyOtpResponse> {
+		await this.otpService.verifyOtp(email, code)
+
+		const user = await this.usersRepo.findByEmail(email)
+		if (!user) {
+			throw new BadRequestException('Пользователь не найден')
+		}
+
+		await this.usersRepo.updateUser(user.id, {
+			isActivate: true,
+		})
+
+		return { message: 'Email успешно подтвержден' }
 	}
 
 	private async auth(res: Response, user: User) {

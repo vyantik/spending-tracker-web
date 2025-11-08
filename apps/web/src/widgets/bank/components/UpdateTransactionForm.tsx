@@ -74,7 +74,6 @@ export function UpdateTransactionForm({
 	const transactionType = form.watch('type')
 
 	const onSubmit = (values: TransactionUpdateRequest) => {
-		// Очищаем неиспользуемые поля в зависимости от типа
 		if (values.type === 'DEPOSIT') {
 			values.category = undefined
 		} else if (values.type === 'WITHDRAW') {

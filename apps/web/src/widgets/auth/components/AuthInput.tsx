@@ -14,6 +14,8 @@ interface IAuthInputProps {
 	onFocus?: () => void
 	error?: string
 	disabled?: boolean
+	maxLength?: number
+	placeholder?: string
 }
 
 export const AuthInput = ({
@@ -25,6 +27,8 @@ export const AuthInput = ({
 	onFocus,
 	error,
 	disabled,
+	maxLength,
+	placeholder,
 }: IAuthInputProps): ReactElement => {
 	const [isFocused, setIsFocused] = useState(false)
 
@@ -63,6 +67,8 @@ export const AuthInput = ({
 				onChange={handleChange}
 				value={value}
 				disabled={disabled}
+				maxLength={maxLength}
+				placeholder={placeholder}
 			/>
 			{error && <p className='text-destructive text-sm mt-1'>{error}</p>}
 		</div>

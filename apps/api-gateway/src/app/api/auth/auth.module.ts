@@ -10,7 +10,10 @@ import { UsersRepository } from '../users/users.repository'
 
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { OtpRepository } from './repositories/otp.repository'
+import { OtpService } from './services/otp.service'
 import { AUTH_SERVICE_TOKEN } from './tokens'
+import { OTP_REPOSITORY_TOKEN } from './tokens'
 
 @Module({
 	imports: [
@@ -33,6 +36,12 @@ import { AUTH_SERVICE_TOKEN } from './tokens'
 		},
 		UsersRepository,
 		JwtStrategy,
+		{
+			provide: OTP_REPOSITORY_TOKEN,
+			useClass: OtpRepository,
+		},
+		OtpRepository,
+		OtpService,
 	],
 })
 export class AuthModule {}

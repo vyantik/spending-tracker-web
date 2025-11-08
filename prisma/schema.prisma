@@ -18,6 +18,8 @@ model User {
 
   role UserRole @default(REGULAR)
 
+  isActivate Boolean @default(false) @map("is_activate")
+
   bank   Bank?   @relation(fields: [bankId], references: [id])
   bankId String? @map("bank_id")
 

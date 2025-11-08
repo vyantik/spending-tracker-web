@@ -46,7 +46,6 @@ export type StringValue =
 	| `${number} ${UnitAnyCase}`
 
 export function ms(str: StringValue): number {
-	// Проверка входных данных
 	if (typeof str !== 'string' || str.length === 0 || str.length > 100) {
 		throw new Error(
 			'Значение, переданное в ms(), должно быть строкой длиной от 1 до 99 символов',

@@ -3,6 +3,8 @@ import type {
 	LoginResponse,
 	RegisterRequest,
 	RegisterResponse,
+	VerifyOtpRequest,
+	VerifyOtpResponse,
 } from '@hermes/contracts'
 
 import { api } from '@/shared/api'
@@ -22,6 +24,10 @@ class AuthService {
 
 	public async refresh(): Promise<LoginResponse> {
 		return await api.post<LoginResponse>('/auth/refresh')
+	}
+
+	public async verifyOtp(body: VerifyOtpRequest): Promise<VerifyOtpResponse> {
+		return await api.post<VerifyOtpResponse>('/auth/verify-otp', body)
 	}
 }
 

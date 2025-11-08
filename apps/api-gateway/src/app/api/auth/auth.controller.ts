@@ -23,6 +23,8 @@ import {
 	LoginResponse,
 	RegisterRequest,
 	RegisterResponse,
+	VerifyOtpRequest,
+	VerifyOtpResponse,
 } from './dto'
 
 @ApiTags('Authorization')
@@ -83,5 +85,23 @@ export class AuthController {
 		@Res({ passthrough: true }) res: Response,
 	): Promise<LoginResponse> {
 		return await this.authService.refresh(req, res)
+	}
+
+	@ApiOperation({ summary: 'Verify OTP' })
+	@ApiBody({ type: VerifyOtpRequest })
+	@ApiOkResponse({ type: VerifyOtpResponse })
+	@ApiBadRequestResponse({
+		example: {
+			message: 'Неверный код верификации',
+			error: 'Bad Request',
+			statusCode: 400,
+		},
+	})
+	@HttpCode(HttpStatus.OK)
+	@Post('verify-otp')
+	public async verifyOtp(
+		@Body() dto: VerifyOtpRequest,
+	): Promise<VerifyOtpResponse> {
+		return await this.authService.verifyOtp(dto)
 	}
 }

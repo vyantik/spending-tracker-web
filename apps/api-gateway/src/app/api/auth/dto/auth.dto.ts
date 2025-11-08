@@ -3,6 +3,8 @@ import {
 	LoginResponseSchema,
 	RegisterRequestSchema,
 	RegisterResponseSchema,
+	VerifyOtpRequestSchema,
+	VerifyOtpResponseSchema,
 } from '@hermes/contracts'
 import { createZodDto } from 'nestjs-zod'
 
@@ -11,3 +13,6 @@ export class RegisterResponse extends createZodDto(RegisterResponseSchema) {}
 
 export class LoginRequest extends createZodDto(LoginRequestSchema) {}
 export class LoginResponse extends createZodDto(LoginResponseSchema) {}
+
+export class VerifyOtpRequest extends createZodDto(VerifyOtpRequestSchema) {}
+export class VerifyOtpResponse extends createZodDto(VerifyOtpResponseSchema) {}

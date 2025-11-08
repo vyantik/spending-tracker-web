@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express'
 
-import type { LoginResponse, RegisterResponse } from '../dto'
+import type {
+	LoginResponse,
+	RegisterResponse,
+	VerifyOtpRequest,
+	VerifyOtpResponse,
+} from '../dto'
 
 export interface IAuthService {
 	register(dto: {
@@ -14,4 +19,5 @@ export interface IAuthService {
 	): Promise<LoginResponse>
 	logout(res: Response): void
 	refresh(req: Request, res: Response): Promise<LoginResponse>
+	verifyOtp(dto: VerifyOtpRequest): Promise<VerifyOtpResponse>
 }

@@ -13,13 +13,15 @@ export function useRegisterMutation(onSuccessCallback?: () => void) {
 		mutationKey: ['register user'],
 		mutationFn: ({ values }: { values: RegisterRequest }) =>
 			authService.register(values),
-		onSuccess() {
+		onSuccess(_data, variables) {
 			toast.success('Успешная регистрация', {
 				description:
 					'Подтвердите почту. Сообщение было отправлено на ваш почтовый адрес.',
 			})
 			onSuccessCallback?.()
-			router.push('/auth/login')
+			router.push(
+				`/auth/verify-otp?email=${encodeURIComponent(variables.values.email)}`,
+			)
 		},
 		onError(error) {
 			toastMessageHandler(error)

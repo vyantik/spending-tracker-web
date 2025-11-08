@@ -10,6 +10,7 @@ export const UserSchema = z.object({
 	password: z.string(),
 	role: UserRole,
 	bankId: z.string().nullable(),
+	isActivate: z.boolean(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 })
