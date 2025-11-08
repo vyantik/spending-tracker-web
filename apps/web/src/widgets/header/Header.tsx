@@ -80,7 +80,6 @@ export const Header = (): ReactElement => {
 				<ToggleTheme />
 			</div>
 
-			{/* Mobile Navigation */}
 			<div className='flex md:hidden items-center gap-2'>
 				<ToggleTheme />
 				<DropdownMenu

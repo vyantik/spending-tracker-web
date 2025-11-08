@@ -2,18 +2,18 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 export default function middleware(request: NextRequest) {
 	const { url, cookies } = request
-
-	const session = cookies.get('refreshToken')?.value
 	const pathname = request.nextUrl.pathname
+	const session = cookies.get('refreshToken')?.value
 
-	if (pathname === '/') {
-		return NextResponse.next()
-	}
+	const publicPaths = ['/', '/auth']
+	const isPublicPath = publicPaths.some(
+		path => pathname === path || pathname.startsWith(`${path}/`),
+	)
 
-	const isAuthPage = pathname.startsWith('/auth')
+	if (isPublicPath) {
+		const isAuthPage = pathname.startsWith('/auth')
 
-	if (isAuthPage) {
-		if (session) {
+		if (isAuthPage && session) {
 			return NextResponse.redirect(new URL('/profile', url))
 		}
 
@@ -21,12 +21,25 @@ export default function middleware(request: NextRequest) {
 	}
 
 	if (!session) {
-		return NextResponse.redirect(new URL('/auth/login', url))
+		const loginUrl = new URL('/auth/login', url)
+		loginUrl.searchParams.set('redirect', pathname)
+		return NextResponse.redirect(loginUrl)
 	}
 
 	return NextResponse.next()
 }
 
 export const config = {
-	matcher: ['/((?!api|_next|_static|favicon.ico).*)'],
+	// Исключаем статические файлы, API роуты, Next.js внутренние файлы и файлы с расширениями
+	matcher: [
+		/*
+		 * Match all request paths except for the ones starting with:
+		 * - api (API routes)
+		 * - _next/static (static files)
+		 * - _next/image (image optimization files)
+		 * - favicon.ico (favicon file)
+		 * - файлы с расширениями (изображения, шрифты, и т.д.)
+		 */
+		'/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|_next/webpack-hmr).*)',
+	],
 }

@@ -20,8 +20,7 @@ export function useLoginMutation(onSuccessCallback?: () => void) {
 			authService.login(values),
 		onSuccess(data) {
 			localStorage.setItem('access_token', data.access_token)
-			queryClient.resetQueries({ queryKey: ['profile'] })
-			queryClient.refetchQueries({ queryKey: ['profile'] })
+			queryClient.invalidateQueries({ queryKey: ['profile'] })
 			toast.success('Успешная авторизация')
 			onSuccessCallback?.()
 			router.push('/profile')
