@@ -84,7 +84,7 @@ export default function MainPage(): ReactElement {
 							Vylos
 						</h1>
 					</div>
-					<p className='text-lg sm:text-xl text-muted-foreground max-w-2xl'>
+					<p className='text-lg sm:text-xl text-black dark:text-muted-foreground max-w-2xl'>
 						Управляйте своими финансами эффективно. Отслеживайте
 						транзакции, анализируйте расходы и работайте вместе с
 						командой.
